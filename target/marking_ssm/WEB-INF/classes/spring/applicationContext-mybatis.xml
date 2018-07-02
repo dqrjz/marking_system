@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- spring构建sqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--配置数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置mybatis自身的配置文件-->
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+
+        <!--配置mapper文件的路径-->
+        <property name="mapperLocations" value="classpath:mybatis/mappers/**/*.xml"/>
+
+        <!--配置pojo的包路径-->
+        <property name="typeAliasesPackage" value="ga.dqrjz.marking.pojo"/>
+    </bean>
+
+
+    <!-- mapper接口的包扫描 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="ga.dqrjz.marking.mapper" />
+    </bean>
+</beans>

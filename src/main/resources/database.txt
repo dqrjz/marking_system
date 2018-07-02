@@ -1,0 +1,39 @@
+document fact law mark
+
+document(文书: xxxxxx.xml)(注意是xml)
+did(int)		filename_xml     filename_xls
+0~499		000_273841.xml  000_273841.xml_ft2jl.xls
+...
+
+
+fact(事实)
+did(int)	content		document_id
+1		xxxxxxxxx	0
+2		xxxxxxxxx	0
+3		xxxxxxxxx	0
+4		xxxxxxxxx	1
+...
+
+
+law(法条)(name与content之间有":"分隔)
+did(int)	name	content		document_id
+1		xxx	    xxxxxxxxx	0
+2		xxx	    xxxxxxxxx	0
+3		xxx	    xxxxxxxxx	0
+4		xxx	    xxxxxxxxx	1
+...
+
+
+mark(标注)(-1=未标注, 0=不相关, 1=相关)
+did(int)  value   fact_id     law_id  document_id
+1        0       1           1       0
+2        0       1           2       0
+3        1       1           3       0
+4        0       2           1       0
+5        1       2           2       0
+6        1       2           3       0
+...
+
+
+
+document 336 法条为空。

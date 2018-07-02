@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/WdatePicker.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/skin_/table.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/jquery.grid.css"/>
+    <title>工作安排</title>
+
+</head>
+
+<body>
+<div id="container">
+    <div id="hd"></div>
+    <div id="bd">
+        <div id="main">
+            <div class="search-box ue-clear">
+                <div class="search-area">
+
+                    <div class="kv-item ue-clear">
+                        <label class="filter-label">筛选文书：</label>
+                        <div class="kv-item-content ue-clear">
+                            <label for="filter-document-all" class="filter-document">
+                                <input id="filter-document-all" type="radio" name="filter" checked/>
+                                全部
+                            </label>
+                            <label for="filter-document-marked" class="filter-document">
+                                <input id="filter-document-marked" type="radio" name="filter"/>
+                                已标注
+                            </label>
+                            <label for="filter-document-unmarked" class="filter-document">
+                                <input id="filter-document-unmarked" type="radio" name="filter"/>
+                                未标注
+                            </label>
+                            <label for="filter-document-assigned" class="filter-document">
+                                <input id="filter-document-assigned" type="radio" name="filter"/>
+                                已分配
+                            </label>
+                            <label for="filter-document-unassigned" class="filter-document">
+                                <input id="filter-document-unassigned" type="radio" name="filter"/>
+                                未分配
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="kv-item ue-clear" id="div-filter-assigned-user">
+                        <label class="filter-label">筛选用户:</label>
+                        <div class="kv-item-content">
+                            <label class="filter-assigned-user" onchange="selectUser()">
+                                <select>
+
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="batch-assign-user-area" hidden>
+                        <label class="batch-assign-user" onchange="batchAssignUser()">
+                            勾选框批量分配：
+                            <select>
+
+                            </select>
+                        </label>
+                        <a class="confirm-batch-assign-user" onclick="confirmBatchAssignUser()">确认</a>
+                    </div>
+                </div>
+                <!--<div class="search-button">-->
+                <!--<input class="button" type="button" value="搜索一下"/>-->
+                <!--</div>-->
+
+
+            </div>
+
+            <div class="table">
+                <!--<div class="opt ue-clear">
+                	<span class="sortarea">
+                    	<span class="sort">
+                        	<label>排序：</label>
+                            <span class="name">
+                            	<i class="icon"></i>
+                                <span class="text">名称</span>
+                            </span>
+                        </span>
+
+                        <i class="list"></i>
+                        <i class="card"></i>
+                    </span>
+                    <span class="optarea">
+                        <a href="javascript:;" class="add">
+                            <i class="icon"></i>
+                            <span class="text">添加</span>
+                        </a>
+                        <a href="javascript:;" class="delete">
+                            <i class="icon"></i>
+                            <span class="text">删除</span>
+                        </a>
+
+                        <a href="javascript:;" class="statistics">
+                            <i class="icon"></i>
+                            <span class="text">统计</span>
+                        </a>
+
+                        <a href="javascript:;" class="config">
+                            <i class="icon"></i>
+                            <span class="text">配置</span>
+                        </a>
+                    </span>
+                </div>-->
+
+                <div class="grid"></div>
+                <div class="pagination"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/global.js"></script>
+<script type="text/javascript" src="../js/core.js"></script>
+<script type="text/javascript" src="../js/jquery.pagination.js"></script>
+<script type="text/javascript" src="../js/jquery.grid.js"></script>
+<script type="text/javascript" src="../js/Menu.js"></script>
+<script type="text/javascript">
+    // 表头
+    const head = [{
+        label: '编号',
+        width: 50,
+        // sortable: 'default',
+        name: 'did'
+    }, {
+        label: '文件名',
+        width: 150,
+        name: 'filenameXml'
+    }, {
+        label: '案件名称',
+        width: 100
+    }, {
+        label: '案号',
+        width: 100
+    }, {
+        label: '案由',
+        minWidth: 100
+    }, {
+        label: '案件类别',
+        width: 100
+    }, {
+        label: '是否完成标注',
+        width: 100
+    }, {
+        label: '任务分配',
+        width: 130
+    }];
+
+    // 绘制表格
+    $('.grid').Grid({
+        thead: head,
+        tbody: null,
+        height: "auto",
+        checkbox: {
+            single: true
+        },
+        sortCallBack: function (name, index, type) {
+            //todo 表格排序
+            alert(name + "," + index + ',' + type);
+        }
+    }).Grid('addLoading');
+
+    // 全局变量
+    let curPage = 1;
+    const pageSize = 50;
+    let savedDocumentList;
+    let filterDocument = "filter-document-all";
+    let filterUserId = "0";
+    let standardUserList;
+    let similarPrevFilter = false;
+    let checkedCheckboxDidList = [];
+    let batchAssignUserId = -1;
+
+    // 默认隐藏筛选用户
+    $("div#div-filter-assigned-user").hide();
+
+    // 筛选文书radio按钮点击事件
+    $("label.filter-document").click(function () {
+        filterDocument = $(this).children("input").attr("id");
+        if (filterDocument === "filter-document-marked" ||
+            filterDocument === "filter-document-unmarked" ||
+            filterDocument === "filter-document-assigned") {
+            if (!similarPrevFilter) {
+                similarPrevFilter = true;
+            }
+            $("div#div-filter-assigned-user").show();
+            if (filterDocument === "filter-document-marked") {
+                // 按userId获取所有已标注文书
+                filterUserId === "0" ?
+                    selectDocuments({documentMarkingStatus: "Y"}) :
+                    selectDocuments({userId: filterUserId, documentMarkingStatus: "Y"});
+            } else if (filterDocument === "filter-document-unmarked") {
+                // 按userId获取所有未标注文书
+                filterUserId === "0" ?
+                    selectDocuments({documentMarkingStatus: "N"}) :
+                    selectDocuments({userId: filterUserId, documentMarkingStatus: "N"});
+            } else if (filterDocument === "filter-document-assigned") {
+                // 按userId获取所有已分配文书
+                filterUserId === "0" ?
+                    selectDocuments({documentAssignmentStatus: "Y"}) :
+                    selectDocuments({documentAssignmentStatus: "Y", userId: filterUserId});
+            }
+        } else {
+            similarPrevFilter = false;
+            filterUserId = "0";
+            $("div#div-filter-assigned-user").hide();
+            if (filterDocument === "filter-document-all") {
+                // 获取所有文书
+                selectDocuments(null);
+            } else if (filterDocument === "filter-document-unassigned") {
+                // 获取所有未分配文书
+                selectDocuments({documentAssignmentStatus: "N"});
+            }
+        }
+    });
+
+    // 获取所有standard用户的用户名(加载下拉选框)
+    function selectAllStandardUsernames() {
+        $.post(
+            "user/selectAllStandardUsernames",
+            function (userList) {
+                standardUserList = userList;
+                let selectHtml = "<option value='0' selected>所有用户</option>";
+                for (const user of userList) {
+                    selectHtml += "<option value='" + user.uid + "'>" + user.username + "</option>";
+                }
+                $("label.filter-assigned-user select").html(selectHtml);
+            },
+            "json"
+        );
+    }
+
+    selectAllStandardUsernames();
+
+    // 绑定"分配用户"下拉选框触发事件
+    function selectUser() {
+        filterUserId = $("label.filter-assigned-user option:selected").val();
+        if (filterDocument === "filter-document-marked") {
+            // 按userId获取所有已标注文书
+            filterUserId === "0" ?
+                selectDocuments({documentMarkingStatus: "Y"}) :
+                selectDocuments({userId: filterUserId, documentMarkingStatus: "Y"});
+        } else if (filterDocument === "filter-document-unmarked") {
+            // 按userId获取所有未标注文书
+            filterUserId === "0" ?
+                selectDocuments({documentMarkingStatus: "N"}) :
+                selectDocuments({userId: filterUserId, documentMarkingStatus: "N"});
+        } else if (filterDocument === "filter-document-assigned") {
+            // 按userId获取所有已分配文书
+            filterUserId === "0" ?
+                selectDocuments({documentAssignmentStatus: "Y"}) :
+                selectDocuments({documentAssignmentStatus: "Y", userId: filterUserId});
+        }
+    }
+
+    // 填充数据 helper function
+    function showTable() {
+        let tbody = [];
+        let start = (curPage - 1) * pageSize;
+        let end = start + pageSize;
+        let document;
+        let filenameXml, documentMarkingStatus, assignedUsername;
+        for (let i = start; i < end && i < savedDocumentList.length; i++) {
+            document = savedDocumentList[i];
+            filenameXml = "<a href='javascript:;' class='document-filnameXml'" +
+                " onclick='navSelect(" + document.did + ")'>" + document.filenameXml + "</a>";
+            documentMarkingStatus = document.documentMarkingStatus === "N" ?
+                "<span style='color: red'>未标注</span>" : "<span style='color: green'>已标注</span>";
+            assignedUsername = "<label class='assign-user' id='" +
+                document.did + "' onchange='assignUser(" + document.did + ")'><select>";
+            if (document.documentAssignmentStatus === "N") {
+                assignedUsername += "<option value='-1' selected>未分配</option>";
+            } else {
+                assignedUsername += "<option value='-1'>未分配</option>";
+            }
+            for (const user of standardUserList) {
+                if (document.userId === user.uid) {
+                    assignedUsername += "<option value='" + user.uid + "' selected>" + user.username + "</option>";
+                } else {
+                    assignedUsername += "<option value='" + user.uid + "'>" + user.username + "</option>";
+                }
+            }
+            assignedUsername += "</select></label><a class='confirm-assign-user' id='" + document.did +
+                "' href='javascript:;' onclick='confirmAssignUser(" + document.did + ")' hidden>确认</a>";
+            tbody.push([document.did,
+                filenameXml,
+                document.caseName,
+                document.caseNumber,
+                document.caseReason,
+                document.caseCategory,
+                documentMarkingStatus,
+                assignedUsername]);
+        }
+        $('.grid').Grid('setData', tbody, head);
+
+        // 绑定checkbox与did
+        const checkboxList = $("td.ui-table-checkbox input[type='checkbox']");
+        let checkboxIndex = 0;
+        for (let i = start; i < end && i < savedDocumentList.length; i++) {
+            checkboxList.eq(checkboxIndex++).attr("did", savedDocumentList[i].did);
+        }
+        $(".ui-table-checkbox input[type='checkbox']").die().live("click", function () {
+            updateCheckboxDidList();
+        });
+
+        // 批量分配下拉列表填充
+        let batchAssignUserSelectHtml = "<option value='-1' selected>未分配</option>";
+        for (const user of standardUserList) {
+            batchAssignUserSelectHtml += "<option value='" + user.uid + "'>" + user.username + "</option>";
+        }
+        $("label.batch-assign-user select").html(batchAssignUserSelectHtml);
+        $("div#batch-assign-user-area").hide(); // 默认隐藏
+    }
+
+    // 点击文件名触发事件(等同于在左侧导航栏点击相应文书)
+    function navSelect(did) {
+        $("li.subnav-li[data-id="+did+"]",window.parent.document).click();
+    }
+
+    // 勾选框批量分配
+    function updateCheckboxDidList() {
+        checkedCheckboxDidList = [];
+        let checkedCheckboxList = $("td.ui-table-checkbox input[type='checkbox']:checked");
+        for (let i = 0; i < checkedCheckboxList.size(); i++) {
+            checkedCheckboxDidList.push(checkedCheckboxList.eq(i).attr("did"));
+        }
+        if (checkedCheckboxDidList.length !== 0) {
+            $("div#batch-assign-user-area").show();
+            $("a.confirm-batch-assign-user").show();
+        } else {
+            $("div#batch-assign-user-area").hide();
+        }
+    }
+
+    // 勾选框批量分配 下拉选框触发事件
+    function batchAssignUser() {
+        $("a.confirm-batch-assign-user").show();
+    }
+
+
+    // 确认批量分配用户
+    function confirmBatchAssignUser() {
+        let data = {};
+        batchAssignUserId = $("label.batch-assign-user option:selected").val();
+        const documentAssignmentStatus = batchAssignUserId === "-1" ? "N" : "Y";
+        for (let i = 0; i < checkedCheckboxDidList.length; i++) {
+            data['documentList[' + i + '].did'] = checkedCheckboxDidList[i];
+            data['documentList[' + i + '].documentAssignmentStatus'] = documentAssignmentStatus;
+            data['documentList[' + i + '].userId'] = batchAssignUserId;
+        }
+        $.ajax({
+                type: "POST",
+                url: "../document/updateDocuments",
+                data: data,
+                dataType: "json",
+                success: function (res) {
+                    if (res.flag) {
+                        $("a.confirm-batch-assign-user").hide();
+                        let did;
+                        for (let i = 0; i < checkedCheckboxDidList.length; i++) {
+                            did = checkedCheckboxDidList[i];
+                            $("label.assign-user[id=" + did + "] option[value=" + batchAssignUserId + "]")
+                                .attr("selected", true);
+                        }
+                    } else {
+                        alert("提交错误");
+                    }
+                }
+            }
+        );
+    }
+
+    // 分配用户
+    function assignUser(did) {
+        const userId = parseInt($("label.assign-user[id=" + did + "] option:selected").val());
+        if (savedDocumentList[did].userId === userId) {
+            $("a[id=" + did + "]").hide();
+        } else {
+            $("a[id=" + did + "]").show();
+        }
+    }
+
+    // 确认分配用户
+    function confirmAssignUser(did) {
+        const userId = $("label.assign-user[id=" + did + "] option:selected").val();
+        const data = userId === "-1" ?
+            {did: did, documentAssignmentStatus: "N", userId: userId} :
+            {did: did, documentAssignmentStatus: "Y", userId: userId};
+        // 更新该文书分配的用户
+        $.post(
+            "../document/updateDocument",
+            data,
+            function (res) {
+                if (res.flag) {
+                    $("a[id=" + did + "]").hide();
+                } else {
+                    alert("提交错误");
+                }
+            },
+            "json"
+        );
+    }
+
+
+    // 默认选择所有文书
+    selectDocuments(null);
+
+    // 按筛选条件获取文书
+    function selectDocuments(conditions) {
+        $.post(
+            "../document/selectDocuments",
+            conditions,
+            function (unassignedDocumentList) {
+                savedDocumentList = unassignedDocumentList;
+                showPage();
+                showTable();
+            },
+            "json"
+        );
+    }
+
+    // 分页
+    function showPage() {
+        curPage = 1;
+        $('.pagination').pagination(savedDocumentList.length, {
+            callback: function (page) {
+                curPage = page + 1;
+                showTable();
+            },
+            display_msg: true
+        });
+    }
+
+    // // 搜索一下
+    // $('.search-box input[type=radio]').click(function (e) {
+    //     if ($(this).prop('checked')) {
+    //         if ($(this).attr('data-define') === 'define') {
+    //             $('.define-input').show();
+    //         } else {
+    //             $('.define-input').hide();
+    //         }
+    //     }
+    // });
+
+</script>
+
+</html>

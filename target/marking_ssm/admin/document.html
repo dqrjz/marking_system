@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../css/document.css">
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/skin_/table.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/jquery.grid.css"/>
+    <title>文书标注</title>
+</head>
+<body>
+<div id="container">
+    <div id="hd">
+
+    </div>
+    <div id="bd">
+        <div id="main">
+            <h2 class="subfield">
+                <span>基本信息</span>
+            </h2>
+            <div class="subfield-content">
+                <table id="basic_info_table">
+                    <tbody>
+                    <tr>
+                        <td id="case-name">案件名称：...</td>
+                        <td id="case-number">案号：...</td>
+                    </tr>
+                    <tr>
+                        <td id="case-reason">案由：...</td>
+                        <td id="case-category">案件类别：...</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <h2 class="subfield">
+                <span>事实列表</span>
+            </h2>
+            <div class="subfield-content">
+                <div class="search-box ue-clear" id="fact-nav-wrapper">
+                    <div class="fact-nav">
+
+                    </div>
+                </div>
+                <div class="ue-clear" id="fact-content"></div>
+            </div>
+
+            <div class="table">
+
+                <!--<div class="opt ue-clear">
+                    <span class="sortarea">
+                        <span class="sort">
+                            <label>排序：</label>
+                            <span class="name">
+                                <i class="icon"></i>
+                                <span class="text">名称</span>
+                            </span>
+                        </span>
+                        <i class="list"></i>
+                        <i class="card"></i>
+                    </span>
+                    <span class="optarea">
+                        <a href="javascript:;" class="add">
+                            <i class="icon"></i>
+                            <span class="text">添加</span>
+                        </a>
+                        <a href="javascript:;" class="delete">
+                            <i class="icon"></i>
+                            <span class="text">删除</span>
+                        </a>
+
+                        <a href="javascript:;" class="statistics">
+                            <i class="icon"></i>
+                            <span class="text">统计</span>
+                        </a>
+
+                        <a href="javascript:;" class="config">
+                            <i class="icon"></i>
+                            <span class="text">配置</span>
+                        </a>
+                    </span>
+                </div>-->
+
+                <div class="grid"></div>
+                <!--<div class="fact-nav"></div>-->
+                <div class="search-button">
+                    <input class="button blue" id="submit-marks" disabled="disabled"
+                           type="button" value="提交" onclick="submitMarks()"/>
+                    <span id="submit-msg"></span>
+                    <input class="button white" id="reset-marks"
+                           type="button" value="还原修改" onclick="resetMarks()"/>
+                    <input class="button gray" id="clear-marks"
+                           type="button" value="清空标注" onclick="clearMarks()"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" src="../js/getParameter.js"></script>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/global.js"></script>
+<script type="text/javascript" src="../js/jquery.select.js"></script>
+<script type="text/javascript" src="../js/core.js"></script>
+<script type="text/javascript" src="../js/jquery.pagination.marking.js"></script>
+<script type="text/javascript" src="../js/jquery.grid.js"></script>
+<script type="text/javascript">
+    $('select').select();
+    const head = [{
+        label: '标注',
+        width: 120,
+        name: 'mark'
+    }, {
+        label: '法条名称',
+        width: 320,
+        name: 'lawName'
+    }, {
+        label: '法条正文',
+        minWidth: 400,
+        name: 'lawContent'
+    }];
+
+    $('.grid').Grid({
+        thead: head,
+        tbody: null,
+        height: "auto",
+        nowrap: false
+    }).Grid('addLoading');
+
+    const did = getParameter("did");
+    let savedDocument;
+    let curFactIndex = 0;
+    let totalFacts, totalLaws, totalMarks;
+    selectDocumentByDid();
+
+    function selectDocumentByDid() {
+        $.ajax({
+            type: "POST",
+            url: "../document/selectDocument",
+            data: {"did": did},
+            dataType: "json",
+            success: function (document) {
+                console.log(document);
+                savedDocument = document;
+                totalFacts = document.factList.length;
+                totalLaws = totalMarks = document.lawList.length;
+                showCaseInfo();
+                showFactNav();
+                showFact();
+            }
+        });
+    }
+
+    // helper functions
+    function showCaseInfo() {
+        $("td#case-name").html("案件名称：" + savedDocument.caseName)
+        $("td#case-number").html("案号：" + savedDocument.caseNumber)
+        $("td#case-reason").html("案由：" + savedDocument.caseReason)
+        $("td#case-category").html("案件类别：" + savedDocument.caseCategory)
+    }
+
+    function showFactNav() {
+        let factNav = "";
+        for (let i = 0; i < totalFacts; i++) {
+            if (i === curFactIndex) {
+                savedDocument.factList[i].factMarkingStatus === "Y" ?
+                    factNav += "<span class='current marked'>事实" + (i + 1) + "</span>" :
+                    factNav += "<span class='current unmarked'>事实" + (i + 1) + "</span>";
+            } else {
+                savedDocument.factList[i].factMarkingStatus === "Y" ?
+                    factNav += "<a href='javascript:;' class='marked' " +
+                        "onclick='selectFact(" + i + ")'>事实" + (i + 1) + "</a>" :
+                    factNav += "<a href='javascript:;' class='unmarked' " +
+                        "onclick='selectFact(" + i + ")'>事实" + (i + 1) + "</a>";
+            }
+        }
+        $("div.fact-nav").html(factNav);
+    }
+
+    function showFact() {
+        let tbody = [];
+        let oper;
+        let mid, value;
+        $("div#fact-content").html(savedDocument.factList[curFactIndex].content);
+        for (let i = 0; i < totalLaws; i++) {
+            mid = savedDocument.factList[curFactIndex].markList[i].mid;
+            oper = "<label for='mark-" + mid + "-0' class='mark'>" +
+                "<input id='mark-" + mid + "-0' type='radio' name='mark-" + mid + "' value='0'/>不相关</label>" +
+                "<br><label for='mark-" + mid + "-1' class='mark'>" +
+                "<input id='mark-" + mid + "-1' type='radio' name='mark-" + mid + "' value='1'/>相关</label>";
+            tbody.push([oper,
+                savedDocument.lawList[i].name,
+                savedDocument.lawList[i].content]);
+        }
+        $('.grid').Grid('setData', tbody, head);
+        for (let i = 0; i < totalMarks; i++) {
+            mid = savedDocument.factList[curFactIndex].markList[i].mid;
+            value = savedDocument.factList[curFactIndex].markList[i].value;
+            if (value === 0) {
+                $("input#mark-" + mid + "-0").attr("checked", true);
+            } else if (value === 1) {
+                $("input#mark-" + mid + "-1").attr("checked", true);
+            }
+        }
+        $("label.mark").click(function () {
+            checkIfMarksChanged()
+        });
+    }
+
+    function selectFact(factIndex) {
+        curFactIndex = parseInt(factIndex);
+        showFactNav();
+        showFact();
+        $("input#submit-marks").attr("disabled", true);
+        $("span#submit-msg").remove("success-msg").text("");
+    }
+
+    // 提交该事实的标注
+    function submitMarks() {
+        let data = {};
+        let mid, checkedValue, value, factId, documentId;
+        for (let i = 0; i < totalMarks; i++) {
+            mid = savedDocument.factList[curFactIndex].markList[i].mid;
+            checkedValue = $("input[name='mark-" + mid + "']:checked").val();
+            value = checkedValue ? parseInt(checkedValue) : -1;
+            factId = savedDocument.factList[curFactIndex].markList[i].factId;
+            documentId = savedDocument.factList[curFactIndex].markList[i].documentId;
+            data['markList[' + i + '].mid'] = mid;
+            data['markList[' + i + '].value'] = value;
+            data['markList[' + i + '].factId'] = factId;
+            data['markList[' + i + '].documentId'] = documentId;
+        }
+        $.ajax({
+                type: "POST",
+                url: "../mark/updateMarks",
+                data: data,
+                dataType: "json",
+                success: function () {
+                    selectDocumentByDid();
+                    $("span#submit-msg").addClass("success-msg").text("提交成功");
+                    console.log("提交成功");
+                },
+                error: function () {
+                    $("span#submit-msg").addClass("error-msg").text("提交失败");
+                    console.log("提交失败");
+                }
+            }
+        );
+        $("input#submit-marks").attr("disabled", true);
+    }
+
+    // 清空该事实的标注
+    function clearMarks() {
+        let mid;
+        for (let i = 0; i < totalMarks; i++) {
+            mid = savedDocument.factList[curFactIndex].markList[i].mid;
+            $("input#mark-" + mid + "-0").attr("checked", false);
+            $("input#mark-" + mid + "-1").attr("checked", false);
+        }
+        checkIfMarksChanged();
+    }
+
+    // 还原该事实的标注
+    function resetMarks() {
+        let mid, value;
+        for (let i = 0; i < totalMarks; i++) {
+            mid = savedDocument.factList[curFactIndex].markList[i].mid;
+            value = savedDocument.factList[curFactIndex].markList[i].value;
+            if (value === 0) {
+                $("input#mark-" + mid + "-0").attr("checked", true);
+            } else if (value === 1) {
+                $("input#mark-" + mid + "-1").attr("checked", true);
+            } else {
+                $("input#mark-" + mid + "-0").attr("checked", false);
+                $("input#mark-" + mid + "-1").attr("checked", false);
+            }
+        }
+        $("input#submit-marks").attr("disabled", true);
+    }
+
+    // 判断标注是否有修改，改变"提交"按钮样式
+    function checkIfMarksChanged() {
+        let mid, checkedValue, value;
+        let changed = false;
+        for (let i = 0; i < totalMarks; i++) {
+            mid = savedDocument.factList[curFactIndex].markList[i].mid;
+            value = savedDocument.factList[curFactIndex].markList[i].value;
+            checkedValue = $("input[name='mark-" + mid + "']:checked").val();
+            checkedValue = checkedValue ? parseInt(checkedValue) : -1;
+            if (checkedValue !== value) {
+                changed = true;
+                break;
+            }
+        }
+        if (changed) {
+            $("input#submit-marks").attr("disabled", false);
+            $("span#submit-msg").remove("success-msg").text("");
+        } else {
+            $("input#submit-marks").attr("disabled", true);
+        }
+    }
+
+</script>
+</html>

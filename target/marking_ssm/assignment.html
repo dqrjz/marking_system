@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="css/WdatePicker.css"/>
+    <link rel="stylesheet" type="text/css" href="css/skin_/table.css"/>
+    <link rel="stylesheet" type="text/css" href="css/jquery.grid.css"/>
+    <title>工作安排查询</title>
+</head>
+
+<body>
+<div id="container">
+    <div id="hd"></div>
+    <div id="bd">
+        <div id="main">
+            <div class="search-box ue-clear">
+                <div class="search-area">
+
+                    <div class="kv-item ue-clear">
+                        <label>筛选文书：</label>
+                        <div class="kv-item-content ue-clear">
+                            <label for="filter-document-all" class="filter-document">
+                                <input id="filter-document-all" type="radio" name="filter" checked/>
+                                全部
+                            </label>
+                            <label for="filter-document-marked" class="filter-document">
+                                <input id="filter-document-marked" type="radio" name="filter"/>
+                                已标注
+                            </label>
+                            <label for="filter-document-unmarked" class="filter-document">
+                                <input id="filter-document-unmarked" type="radio" name="filter"/>
+                                未标注
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+                <!--<div class="search-button">-->
+                <!--<input class="button" type="button" value="搜索一下"/>-->
+                <!--</div>-->
+            </div>
+
+            <div class="table">
+                <!--<div class="opt ue-clear">
+                	<span class="sortarea">
+                    	<span class="sort">
+                        	<label>排序：</label>
+                            <span class="name">
+                            	<i class="icon"></i>
+                                <span class="text">名称</span>
+                            </span>
+                        </span>
+
+                        <i class="list"></i>
+                        <i class="card"></i>
+                    </span>
+                    <span class="optarea">
+                        <a href="javascript:;" class="add">
+                            <i class="icon"></i>
+                            <span class="text">添加</span>
+                        </a>
+                        <a href="javascript:;" class="delete">
+                            <i class="icon"></i>
+                            <span class="text">删除</span>
+                        </a>
+
+                        <a href="javascript:;" class="statistics">
+                            <i class="icon"></i>
+                            <span class="text">统计</span>
+                        </a>
+
+                        <a href="javascript:;" class="config">
+                            <i class="icon"></i>
+                            <span class="text">配置</span>
+                        </a>
+                    </span>
+                </div>-->
+
+                <div class="grid"></div>
+
+                <div class="pagination"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/global.js"></script>
+<script type="text/javascript" src="js/jquery.select.js"></script>
+<script type="text/javascript" src="js/core.js"></script>
+<script type="text/javascript" src="js/jquery.pagination.20.js"></script>
+<script type="text/javascript" src="js/jquery.grid.js"></script>
+<script type="text/javascript" src="js/WdatePicker.js"></script>
+<script type="text/javascript">
+    $('select').select();
+    var head = [{
+        label: '编号',
+        width: 50,
+        // sortable: 'default',
+        name: 'did'
+    }, {
+        label: '文件名',
+        width: 150,
+        name: 'filenameXml'
+    }, {
+        label: '案件名称',
+        width: 100
+    }, {
+        label: '案号',
+        width: 100
+    }, {
+        label: '案由',
+        minWidth: 100
+    }, {
+        label: '案件类别',
+        width: 100
+    }, {
+        label: '是否完成标注',
+        width: 100
+    }/*, {
+        label: '操作',
+        width: 50
+    }*/];
+
+    // 绘制表格
+    $('.grid').Grid({
+        thead: head,
+        tbody: null,
+        height: "auto",
+        sortCallBack: function (name, index, type) {
+            //todo 表格排序
+            alert(name + "," + index + ',' + type);
+        }
+    }).Grid('addLoading');
+
+
+    // 全局变量
+    let curPage = 1;
+    const pageSize = 20;
+    let savedDocumentList;
+
+    // 筛选文书radio按钮点击事件
+    $("label.filter-document").click(function () {
+        filterDocument = $(this).children("input").attr("id");
+        if (filterDocument === "filter-document-all") {
+            // 获取该用户所有文书
+            selectDocuments(null);
+        } else if (filterDocument === "filter-document-marked") {
+            // 获取该用户所有已标注文书
+            selectDocuments({documentMarkingStatus: "Y"});
+        } else if (filterDocument === "filter-document-unmarked") {
+            // 获取该用户所有未标注文书
+            selectDocuments({documentMarkingStatus: "N"});
+        }
+    });
+
+    // 填充数据 helper function
+    function showTable() {
+        let tbody = [];
+        let start = (curPage - 1) * pageSize;
+        let end = start + pageSize;
+        let document;
+        let filenameXml, documentMarkingStatus;
+        for (let i = start; i < end && i < savedDocumentList.length; i++) {
+            document = savedDocumentList[i];
+            filenameXml = "<a href='javascript:;' class='document-filnameXml'" +
+                " onclick='navSelect(" + document.did + ")'>" + document.filenameXml + "</a>";
+            documentMarkingStatus = document.documentMarkingStatus === "N" ?
+                "<span style='color: red'>未标注</span>" : "<span style='color: green'>已标注</span>";
+            tbody.push([document.did,
+                filenameXml,
+                document.caseName,
+                document.caseNumber,
+                document.caseReason,
+                document.caseCategory,
+                documentMarkingStatus]);
+        }
+        $('.grid').Grid('setData', tbody, head);
+    }
+
+    // 点击文件名触发事件(等同于在左侧导航栏点击相应文书)
+    function navSelect(did) {
+        $("li.subnav-li[data-id=" + did + "]", window.parent.document).click();
+    }
+
+    // 默认选择所有文书
+    selectDocuments(null);
+
+    // 按筛选条件获取文书
+    function selectDocuments(conditions) {
+        $.post(
+            "./document/selectDocuments",
+            conditions,
+            function (unassignedDocumentList) {
+                savedDocumentList = unassignedDocumentList;
+                showPage();
+                showTable();
+            },
+            "json"
+        );
+    }
+
+    // 分页
+    function showPage() {
+        curPage = 1;
+        $('.pagination').pagination(savedDocumentList.length, {
+            callback: function (page) {
+                curPage = page + 1;
+                showTable();
+            },
+            display_msg: true
+        });
+    }
+</script>
+</html>

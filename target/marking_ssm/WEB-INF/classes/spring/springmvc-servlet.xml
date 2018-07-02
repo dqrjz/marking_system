@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!-- 配置注解驱动，替代推荐使用的映射器以及适配器，json转换器 -->
+    <mvc:annotation-driven/>
+
+    <!-- 开启注解扫描 -->
+    <context:component-scan base-package="ga.dqrjz.marking.controller"/>
+
+    <!--放行静态资源-->
+    <mvc:default-servlet-handler/>
+
+    <!-- 配置视图解析器 -->
+    <!-- Example: prefix="/", suffix=".html", viewname="test" -> "/test.html"  -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"/>
+        <property name="suffix" value=".html"/>
+    </bean>
+
+    <!-- 加载文书 -->
+    <bean class="ga.dqrjz.marking.util.ImportUtil">
+        <property name="documentPath" value="/500_facts_and_laws"/>
+    </bean>
+
+    <!-- 注册登录拦截器 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!-- 拦截所有请求 -->
+            <mvc:mapping path="/**"/>
+            <mvc:mapping path="/*.html"/>
+            <mvc:exclude-mapping path="/**/fonts/*"/>
+            <mvc:exclude-mapping path="/**/*.css"/>
+            <mvc:exclude-mapping path="/**/*.js"/>
+            <mvc:exclude-mapping path="/**/*.png"/>
+            <mvc:exclude-mapping path="/**/*.gif"/>
+            <mvc:exclude-mapping path="/**/*.jpg"/>
+            <mvc:exclude-mapping path="/**/*.jpeg"/>
+            <mvc:exclude-mapping path="/user/*"/>
+            <mvc:exclude-mapping path="/assets/*"/>
+            <mvc:exclude-mapping path="/img/*"/>
+            <mvc:exclude-mapping path="/js/*"/>
+            <mvc:exclude-mapping path="/css/*"/>
+            <mvc:exclude-mapping path="/login.html"/>
+            <!-- 自定义拦截器的全路径 -->
+            <bean class="ga.dqrjz.marking.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+</beans>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ga.dqrjz.marking.mapper.UserMapper">
+    <select id="selectAllStandardUsernames" resultType="User">
+        select
+            uid,
+            username
+        from user
+        where privilege = 'standard'
+        order by uid asc
+    </select>
+</mapper>
