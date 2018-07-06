@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Service("documentService")
 public class DocumentServiceImpl implements DocumentService {
 	@Autowired
@@ -46,27 +47,7 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return documentMapper.select(document);
 	}
-	
-	@Override
-	public List<Document> selectMarkedDocumentIds() {
-		return documentMapper.selectMarkedDocumentIds();
-	}
-	
-	@Override
-	public List<Document> selectUnmarkedDocumentIds() {
-		return documentMapper.selectUnmarkedDocumentIds();
-	}
-	
-	@Override
-	public List<Document> selectMarkedDocumentIdsByUserId(Long userId) {
-		return documentMapper.selectMarkedDocumentIdsByUserId(userId);
-	}
-	
-	@Override
-	public List<Document> selectUnmarkedDocumentIdsByUserId(Long userId) {
-		return documentMapper.selectUnmarkedDocumentIdsByUserId(userId);
-	}
-	
+
 	@Override
 	public void updateDocument(Document document) {
 		documentMapper.updateByPrimaryKeySelective(document);

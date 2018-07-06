@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Service("userService")
 public class UserServiceImpl implements UserService {
 	@Autowired

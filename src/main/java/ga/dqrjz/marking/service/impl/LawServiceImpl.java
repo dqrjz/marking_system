@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Service("lawService")
 public class LawServiceImpl implements LawService {
 	@Autowired

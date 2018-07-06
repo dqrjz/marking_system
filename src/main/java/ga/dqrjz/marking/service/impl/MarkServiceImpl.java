@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Service("markService")
 public class MarkServiceImpl implements MarkService {
 	@Autowired
@@ -22,16 +23,6 @@ public class MarkServiceImpl implements MarkService {
 	private FactMapper factMapper;
 	@Autowired
 	private DocumentMapper documentMapper;
-
-//	@Override
-//	public void updateMarksByFactId(Long factId, List<Integer> markValueList) {
-//		List<Mark> markList = markMapper.selectMarksByFactId(factId);
-//		for (int i = 0; i < markList.size(); i++) {
-//			Mark mark = markList.get(i);
-//			mark.setValue(markValueList.get(i));
-//			markMapper.updateByPrimaryKeySelective(mark);
-//		}
-//	}
 	
 	@Override
 	public void updateMarks(List<Mark> markList) {

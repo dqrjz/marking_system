@@ -1,7 +1,7 @@
 package ga.dqrjz.marking.mapper;
 
-import com.github.abel533.mapper.Mapper;
 import ga.dqrjz.marking.pojo.User;
+import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
 

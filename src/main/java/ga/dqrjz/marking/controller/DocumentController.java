@@ -1,6 +1,9 @@
 package ga.dqrjz.marking.controller;
 
-import ga.dqrjz.marking.pojo.*;
+import ga.dqrjz.marking.pojo.Document;
+import ga.dqrjz.marking.pojo.DocumentVO;
+import ga.dqrjz.marking.pojo.ResultInfo;
+import ga.dqrjz.marking.pojo.User;
 import ga.dqrjz.marking.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -79,5 +82,5 @@ public class DocumentController {
 		documentService.updateDocuments(documentVO.getDocumentList());
 		return new ResultInfo(true);
 	}
-
+	
 }
