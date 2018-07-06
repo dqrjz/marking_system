@@ -14,14 +14,14 @@
         $(function () {
             $("span#username").hide();//登录信息隐藏
             //请求servlet，获取登录用户数据
-            $.post(
-                "../user/getLoginUserData",
+            $.get(
+                "../api/user/loginData",
                 function (resultInfo) {
                     if (resultInfo.flag) {
                         //已登录
                         $("span#username").html(resultInfo.data.username).show();
                     } else {
-                        window.location.href = "/login.html";
+                        window.location.href = "../login";
                     }
                 },
                 "json"
@@ -57,7 +57,7 @@
     </div>
 
     <div id="bd">
-        <iframe width="100%" height="100%" id="mainIframe" src="nav.html" frameborder="0"></iframe>
+        <iframe width="100%" height="100%" id="mainIframe" src="/admin/nav.html" frameborder="0"></iframe>
     </div>
 
     <!--<div id="ft" class="ue-clear">-->
@@ -118,12 +118,12 @@
 
         if ($(this).hasClass('ok')) {
             //退出登陆
-            $.post(
-                "../user/logout",
+            $.get(
+                "../api/user/logout",
                 function (resultInfo) {
                     if (resultInfo.flag) {
                         //登出成功，跳转到登录页面
-                        window.location.href = "../login.html";
+                        window.location.href = "../login";
                     }
                 },
                 "json"

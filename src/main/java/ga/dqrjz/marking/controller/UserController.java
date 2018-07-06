@@ -7,23 +7,21 @@ import ga.dqrjz.marking.pojo.ResultInfo;
 import ga.dqrjz.marking.pojo.User;
 import ga.dqrjz.marking.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-@RequestMapping("user")
-@Controller
+@RequestMapping("api/user")
+@RestController
 public class UserController {
 	@Autowired
 	private UserService userService;
 	
 	//处理用户登录请求
-	@PostMapping(value = "getLoginUserData")
-	@ResponseBody
+	@GetMapping(value = "loginData")
 	public ResultInfo getLoginUserData(HttpServletRequest request) {
 		//实例返回结果对象
 		ResultInfo resultInfo;
@@ -40,7 +38,6 @@ public class UserController {
 	}
 	
 	@PostMapping(value = "login")
-	@ResponseBody
 	public ResultInfo login(HttpServletRequest request, User user) {
 		//实例返回结果对象
 		ResultInfo resultInfo = null;
@@ -57,7 +54,7 @@ public class UserController {
 				//登录成功，将登录用户数据写入session
 				request.getSession().setAttribute("loginUser", loginUser);
 				request.getSession().setAttribute("privilege", loginUser.getPrivilege());
-				resultInfo = new ResultInfo(true,loginUser.getPrivilege());
+				resultInfo = new ResultInfo(true, loginUser.getPrivilege());
 			}
 		} catch (PasswordErrorException | UserNotFoundException | UsernameNullException e) {
 			e.printStackTrace();//让开发人员看
@@ -71,8 +68,7 @@ public class UserController {
 	}
 	
 	//处理用户注销请求
-	@PostMapping(value = "logout")
-	@ResponseBody
+	@GetMapping(value = "logout")
 	public ResultInfo logout(HttpServletRequest request) {
 		ResultInfo resultInfo = null;
 		try {

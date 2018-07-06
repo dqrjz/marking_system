@@ -135,8 +135,8 @@
 
     function selectDocumentByDid() {
         $.ajax({
-            type: "POST",
-            url: "../document/selectDocument",
+            type: "GET",
+            url: "../api/document/oneDocument",
             data: {"did": did},
             dataType: "json",
             success: function (document) {
@@ -231,8 +231,8 @@
             data['markList[' + i + '].documentId'] = documentId;
         }
         $.ajax({
-                type: "POST",
-                url: "../mark/updateMarks",
+                type: "PATCH",
+                url: "../api/mark/marks",
                 data: data,
                 dataType: "json",
                 success: function () {

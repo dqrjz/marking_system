@@ -222,8 +222,8 @@
 
     // 获取所有standard用户的用户名(加载下拉选框)
     function selectAllStandardUsernames() {
-        $.post(
-            "user/selectAllStandardUsernames",
+        $.get(
+            "../api/admin/user/usernames",
             function (userList) {
                 standardUserList = userList;
                 let selectHtml = "<option value='0' selected>所有用户</option>";
@@ -355,8 +355,8 @@
             data['documentList[' + i + '].userId'] = batchAssignUserId;
         }
         $.ajax({
-                type: "POST",
-                url: "../document/updateDocuments",
+                type: "PATCH",
+                url: "../api/document/documents",
                 data: data,
                 dataType: "json",
                 success: function (res) {
@@ -393,17 +393,19 @@
             {did: did, documentAssignmentStatus: "N", userId: userId} :
             {did: did, documentAssignmentStatus: "Y", userId: userId};
         // 更新该文书分配的用户
-        $.post(
-            "../document/updateDocument",
-            data,
-            function (res) {
-                if (res.flag) {
-                    $("a[id=" + did + "]").hide();
-                } else {
-                    alert("提交错误");
+        $.ajax({
+                type: "PATCH",
+                url: "../api/document/oneDocument",
+                data: data,
+                dataType: "json",
+                success: function (res) {
+                    if (res.flag) {
+                        $("a[id=" + did + "]").hide();
+                    } else {
+                        alert("提交错误");
+                    }
                 }
-            },
-            "json"
+            }
         );
     }
 
@@ -413,8 +415,8 @@
 
     // 按筛选条件获取文书
     function selectDocuments(conditions) {
-        $.post(
-            "../document/selectDocuments",
+        $.get(
+            "../api/document/documents",
             conditions,
             function (unassignedDocumentList) {
                 savedDocumentList = unassignedDocumentList;
@@ -436,18 +438,6 @@
             display_msg: true
         });
     }
-
-    // // 搜索一下
-    // $('.search-box input[type=radio]').click(function (e) {
-    //     if ($(this).prop('checked')) {
-    //         if ($(this).attr('data-define') === 'define') {
-    //             $('.define-input').show();
-    //         } else {
-    //             $('.define-input').hide();
-    //         }
-    //     }
-    // });
-
 </script>
 
 </html>

@@ -117,7 +117,7 @@
             if (username && password) {
                 //提交异步登录请求
                 $.ajax({
-                    url: "user/login", //servlet地址
+                    url: "api/user/login", //servlet地址
                     data: $("#login-form").serialize(),//表单所有数据
                     // data: {"username": username, "password": password},//表单所有数据
                     type: "POST",
@@ -126,9 +126,9 @@
                             //登录成功，跳转到主页面
                             console.log(resultInfo.data);
                             if (resultInfo.data === "admin") {
-                                window.location.href = "admin/main.html";
+                                window.location.href = "admin";
                             } else if (resultInfo.data === "standard") {
-                                window.location.href = "main.html";
+                                window.location.href = "user/" + username;
                             }
                         } else {
                             //失败，显示消息

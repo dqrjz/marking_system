@@ -8,17 +8,17 @@ import ga.dqrjz.marking.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Objects;
 
-@RequestMapping("document")
-@Controller
+@RequestMapping("api/document")
+@RestController
 public class DocumentController {
 	@Autowired
 	private DocumentService documentService;
@@ -28,8 +28,7 @@ public class DocumentController {
 	 *
 	 * @return 按id查询出的document
 	 */
-	@PostMapping(value = "selectDocument")
-	@ResponseBody
+	@GetMapping(value = "oneDocument")
 	public ResponseEntity<Document> selectDocument(Document document, HttpServletRequest request) {
 		User user = (User) request.getSession().getAttribute("loginUser");
 		document.setUser(user);
@@ -45,8 +44,7 @@ public class DocumentController {
 	 *
 	 * @return 符合筛选要求的文书
 	 */
-	@PostMapping(value = "selectDocuments")
-	@ResponseBody
+	@GetMapping(value = "documents")
 	public ResponseEntity<List<Document>> selectDocuments(Document document, HttpServletRequest request) {
 		User user = (User) request.getSession().getAttribute("loginUser");
 		document.setUser(user);
@@ -64,8 +62,7 @@ public class DocumentController {
 	 * @param document document
 	 * @return ResultInfo
 	 */
-	@PostMapping(value = "updateDocument")
-	@ResponseBody
+	@PatchMapping(value = "oneDocument")
 	public ResultInfo updateDocument(Document document, HttpServletRequest request) {
 		User user = (User) request.getSession().getAttribute("loginUser");
 		if (!Objects.equals(user.getPrivilege(), "admin")) {
@@ -75,8 +72,7 @@ public class DocumentController {
 		return new ResultInfo(true);
 	}
 	
-	@RequestMapping(value = "updateDocuments")
-	@ResponseBody
+	@PatchMapping(value = "documents")
 	public ResultInfo updateDocuments(DocumentVO documentVO) {
 		System.out.println(documentVO);
 		documentService.updateDocuments(documentVO.getDocumentList());

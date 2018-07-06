@@ -35,6 +35,12 @@
                                 <span class="subnav-text">任务分配</span>
                             </a>
                         </li>
+                        <li class="subnav-li" href="documents.html" data-id="-2">
+                            <a href="javascript:;" class="ue-clear">
+                                <i class="subnav-icon"></i>
+                                <span class="subnav-text">文书管理</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-li">
@@ -96,8 +102,8 @@
     });
 
     //未标注文书导航列表
-    $.post(
-        "../document/selectDocuments",
+    $.get(
+        "../api/document/documents",
         {documentMarkingStatus: "N"},
         function (unmarkedDocumentList) {
             let html = "";
@@ -113,8 +119,8 @@
     );
 
     //已标注文书导航列表
-    $.post(
-        "../document/selectDocuments",
+    $.get(
+        "../api/document/documents",
         {documentMarkingStatus: "Y"},
         function (markedDocumentList) {
             let html = "";
