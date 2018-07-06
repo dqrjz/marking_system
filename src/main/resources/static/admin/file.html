@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/skin_/table.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/jquery.grid.css"/>
+    <title>文件管理</title>
+</head>
+
+<body>
+<div id="container">
+    <div id="hd"></div>
+    <div id="bd">
+        <div id="main">
+            <!--<a href="/api/file/download">下载test</a>-->
+            <div id="upload">
+                <input id="fileupload" type="file" name="files" data-url="../api/file/upload" multiple>
+            </div>
+            <div class="table">
+                <!--<div class="opt ue-clear">-->
+                    <!--<span class="sortarea">-->
+                    <!--<span class="sort">-->
+                    <!--<label>排序：</label>-->
+                    <!--<span class="name">-->
+                    <!--<i class="icon"></i>-->
+                    <!--<span class="text">名称</span>-->
+                    <!--</span>-->
+                    <!--</span>-->
+
+                    <!--<i class="list"></i>-->
+                    <!--<i class="card"></i>-->
+                    <!--</span>-->
+                    <!--<span class="optarea">-->
+                        <!--<a href="javascript:;" class="add">-->
+                            <!--<i class="icon"></i>-->
+                            <!--<span class="text">添加</span>-->
+                        <!--</a>-->
+                        <!--<a href="javascript:;" class="delete">-->
+                            <!--<i class="icon"></i>-->
+                            <!--<span class="text">删除</span>-->
+                        <!--</a>-->
+                    <!--</span>-->
+                <!--</div>-->
+
+                <div class="grid"></div>
+                <div class="pagination"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../js/jquery.js"></script>
+<script type="text/javascript" src="../js/global.js"></script>
+<script type="text/javascript" src="../js/core.js"></script>
+<script type="text/javascript" src="../js/jquery.pagination.js"></script>
+<script type="text/javascript" src="../js/jquery.grid.js"></script>
+<script type="text/javascript" src="../js/Menu.js"></script>
+<script type="text/javascript">
+
+    // 表头
+    const head = [{
+        label: '编号',
+        width: 50,
+        name: 'did'
+    }, {
+        label: '文书名',
+        width: 150,
+        name: 'filenameXml'
+    }, {
+        label: '文件下载',
+        width: 250,
+        name: 'filenameXls'
+    }];
+
+    // 绘制表格
+    $('.grid').Grid({
+        thead: head,
+        tbody: null,
+        height: "auto",
+        checkbox: {
+            single: true
+        },
+        sortCallBack: function (name, index, type) {
+            alert(name + "," + index + ',' + type);
+        }
+    }).Grid('addLoading');
+
+    // 全局变量
+    let curPage = 1;
+    const pageSize = 50;
+    let savedDocumentList;
+
+    // 填充数据 helper function
+    function showTable() {
+        let tbody = [];
+        let start = (curPage - 1) * pageSize;
+        let end = start + pageSize;
+        let document;
+        let filenameXml;
+        for (let i = start; i < end && i < savedDocumentList.length; i++) {
+            document = savedDocumentList[i];
+            filenameXml = "<a href='javascript:;' class='document-filnameXml'" +
+                " onclick='navSelect(" + document.did + ")'>" + document.filenameXml + "</a>";
+            tbody.push([document.did,
+                filenameXml,
+                document.filenameXls]);
+        }
+        $('.grid').Grid('setData', tbody, head);
+
+        // 绑定checkbox与did
+        const checkboxList = $("td.ui-table-checkbox input[type='checkbox']");
+        let checkboxIndex = 0;
+        for (let i = start; i < end && i < savedDocumentList.length; i++) {
+            checkboxList.eq(checkboxIndex++).attr("did", savedDocumentList[i].did);
+        }
+        $(".ui-table-checkbox input[type='checkbox']").die().live("click", function () {
+            updateCheckboxDidList();
+        });
+
+        // 批量分配下拉列表填充
+        // let batchAssignUserSelectHtml = "<option value='-1' selected>未分配</option>";
+        // for (const user of standardUserList) {
+        //     batchAssignUserSelectHtml += "<option value='" + user.uid + "'>" + user.username + "</option>";
+        // }
+        // $("label.batch-assign-user select").html(batchAssignUserSelectHtml);
+        // $("div#batch-assign-user-area").hide(); // 默认隐藏
+    }
+
+    // 点击文件名触发事件(等同于在左侧导航栏点击相应文书)
+    function navSelect(did) {
+        $("li.subnav-li[data-id=" + did + "]", window.parent.document).click();
+    }
+
+    // 默认选择所有文书
+    selectDocuments(null);
+
+    // 按筛选条件获取文书
+    function selectDocuments(conditions) {
+        $.get(
+            "../api/document/documents",
+            conditions,
+            function (unassignedDocumentList) {
+                savedDocumentList = unassignedDocumentList;
+                showPage();
+                showTable();
+            },
+            "json"
+        );
+    }
+
+    // 分页
+    function showPage() {
+        curPage = 1;
+        $('.pagination').pagination(savedDocumentList.length, {
+            callback: function (page) {
+                curPage = page + 1;
+                showTable();
+            },
+            display_msg: true
+        });
+    }
+</script>
+<!--<script src="../js/jquery-1.9.1.js"></script>-->
+<script src="../js/vendor/jquery.ui.widget.js"></script>
+<script src="../js/jquery.iframe-transport.js"></script>
+<script src="../js/jquery.fileupload.js"></script>
+<script>
+    $(function () {
+        $('#fileupload').fileupload({
+            dataType: 'json',
+            add: function (e, data) {
+                // data.context = $('<p/>').text('Uploading...').appendTo($("#upload"));
+                data.submit();
+            },
+            done: function (e, data) {
+                // data.context.text('Upload finished.');
+                $.each(data.result.files, function (index, file) {
+                    $('<p/>').text(file.name + " uploaded.").appendTo($("#upload"));
+                });
+            }
+        });
+    });
+    // $(function () {
+    //     $('#fileupload').fileupload({
+    //         dataType: 'json',
+    //         done: function (e, data) {
+    //             $.each(data.result.files, function (index, file) {
+    //                 $('<p/>').text(file.name).appendTo(document.body);
+    //             });
+    //         }
+    //     });
+    // });
+</script>
+</html>

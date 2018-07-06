@@ -286,3 +286,6 @@ select {width: 60px;height: 20px;}
 
 /*div#div-filter-assigned-user {float: right;}*/
 label.filter-label, label.batch-assign-user {font-weight: bold; font-size: 13px;}
+
+/*upload*/
+div#upload {margin-bottom: 10px;}
