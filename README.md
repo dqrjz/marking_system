@@ -1,2 +1,2 @@
-# marking_ssm
-Document Marking System using ssm framework.
+# marking_system
+Document Marking System
