@@ -282,7 +282,7 @@ a.confirm-assign-user {margin-left: 10px;}
 a.confirm-batch-assign-user {margin-left: 10px;}
 div#batch-assign-user-area {padding-left: 7px;height: 26px;line-height: 26px;margin:15px 15px 0 0;color: dodgerblue;}
 div#batch-assign-user-area select {width: 100px;height: 30px;}
-select {width: 60px;height: 20px;}
+select {width: 80px;height: 23px;}
 
 /*div#div-filter-assigned-user {float: right;}*/
 label.filter-label, label.batch-assign-user {font-weight: bold; font-size: 13px;}

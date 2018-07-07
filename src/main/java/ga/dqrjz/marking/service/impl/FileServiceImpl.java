@@ -75,7 +75,7 @@ public class FileServiceImpl implements FileService {
 			evidenceMapper.insert(new Evidence(evidenceId++, "无", documentId));
 		} else {
 			while (row0.getCell(col) != null) {
-				String evidenceContent = row0.getCell(col).toString();
+				String evidenceContent = row0.getCell(col).getRichStringCellValue().getString().trim();
 //				String lawName = law[0].trim();
 //				String lawContent = law[1].trim();
 				evidenceMapper.insert(new Evidence(evidenceId++, evidenceContent, documentId));
@@ -87,7 +87,7 @@ public class FileServiceImpl implements FileService {
 		int row = 1;
 		HSSFRow factContentRow;
 		while ((factContentRow = sheet.getRow(row)) != null) {
-			String factContent = factContentRow.getCell(0).toString().trim();
+			String factContent = factContentRow.getCell(0).getRichStringCellValue().getString().trim();
 			factMarkingStatus = "N";
 			factMapper.insert(new Fact(factId++, factContent, documentId, factMarkingStatus));
 			row++;
@@ -104,10 +104,10 @@ public class FileServiceImpl implements FileService {
 				int rowIndex = (int) (row_factId - factId0 + 1);
 				int colIndex = (int) (col_evidenceId - evidenceId0 + 1);
 				markValueCell = sheet.getRow(rowIndex).getCell(colIndex);
-				if (markValueCell == null || StringUtils.isEmpty(markValueCell.toString())) {
+				if (markValueCell == null || StringUtils.isEmpty(markValueCell.getRichStringCellValue().getString())) {
 					value = -1;
 				} else {
-					markValue = (int) Double.parseDouble(markValueCell.toString());
+					markValue = (int) Double.parseDouble(markValueCell.getRichStringCellValue().getString());
 					if (markValue == 0) {
 						value = 0;
 					} else if (markValue == 1) {

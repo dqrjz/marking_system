@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8098
   servlet:
     context-path: /marking_system
 my-props:
