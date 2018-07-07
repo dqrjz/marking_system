@@ -1,5 +1,7 @@
 server:
   port: 8080
+  servlet:
+    context-path: /marking_system
 my-props:
   static-path: /Users/JZ/Documents/GitHub/marking_system/src/main/resources/static
   upload-path: /Users/JZ/Downloads/test
