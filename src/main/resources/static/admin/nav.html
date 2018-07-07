@@ -101,38 +101,46 @@
         }
     });
 
+    selectUnmarkedDocumentList();
+
     //未标注文书导航列表
-    $.get(
-        "../api/document/documents",
-        {documentMarkingStatus: "N"},
-        function (unmarkedDocumentList) {
-            let html = "";
-            for (const unmarkedDocument of unmarkedDocumentList) {
-                html += "<li class='subnav-li' href='document.html?did=" + unmarkedDocument.did +
-                    "' data-id='" + unmarkedDocument.did + "'>\n<a href='javascript:;' class='ue-clear'>\n" +
-                    "<i class='subnav-icon'></i><span class='subnav-text'>" + unmarkedDocument.did +
-                    "</span>\n</a>\n</li>";
-            }
-            $("li.nav-li ul#unmarked-document").html(html);
-        },
-        "json"
-    );
+    function selectUnmarkedDocumentList() {
+        $.get(
+            "../api/document/documents",
+            {documentMarkingStatus: "N"},
+            function (unmarkedDocumentList) {
+                let html = "";
+                for (const unmarkedDocument of unmarkedDocumentList) {
+                    html += "<li class='subnav-li' href='document.html?did=" + unmarkedDocument.did +
+                        "' data-id='" + unmarkedDocument.did + "'>\n<a href='javascript:;' class='ue-clear'>\n" +
+                        "<i class='subnav-icon'></i><span class='subnav-text'>" + unmarkedDocument.did +
+                        "</span>\n</a>\n</li>";
+                }
+                $("li.nav-li ul#unmarked-document").html(html);
+            },
+            "json"
+        );
+    }
+
+    selectMarkedDocumentList();
 
     //已标注文书导航列表
-    $.get(
-        "../api/document/documents",
-        {documentMarkingStatus: "Y"},
-        function (markedDocumentList) {
-            let html = "";
-            for (const markedDocument of markedDocumentList) {
-                html += "<li class='subnav-li' href='document.html?did=" + markedDocument.did +
-                    "' data-id='" + markedDocument.did + "'>\n<a href='javascript:;' class='ue-clear'>\n" +
-                    "<i class='subnav-icon'></i><span class='subnav-text'>" + markedDocument.did +
-                    "</span>\n</a>\n</li>";
-            }
-            $("li.nav-li ul#marked-document").html(html);
-        },
-        "json"
-    );
+    function selectMarkedDocumentList() {
+        $.get(
+            "../api/document/documents",
+            {documentMarkingStatus: "Y"},
+            function (markedDocumentList) {
+                let html = "";
+                for (const markedDocument of markedDocumentList) {
+                    html += "<li class='subnav-li' href='document.html?did=" + markedDocument.did +
+                        "' data-id='" + markedDocument.did + "'>\n<a href='javascript:;' class='ue-clear'>\n" +
+                        "<i class='subnav-icon'></i><span class='subnav-text'>" + markedDocument.did +
+                        "</span>\n</a>\n</li>";
+                }
+                $("li.nav-li ul#marked-document").html(html);
+            },
+            "json"
+        );
+    }
 </script>
 </html>

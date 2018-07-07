@@ -6,6 +6,7 @@ import ga.dqrjz.marking.mapper.MarkMapper;
 import ga.dqrjz.marking.pojo.Document;
 import ga.dqrjz.marking.pojo.Fact;
 import ga.dqrjz.marking.pojo.Mark;
+import ga.dqrjz.marking.service.FileService;
 import ga.dqrjz.marking.service.MarkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ public class MarkServiceImpl implements MarkService {
 	private FactMapper factMapper;
 	@Autowired
 	private DocumentMapper documentMapper;
+	@Autowired
+	private FileService fileService;
 	
 	@Override
 	public void updateMarks(List<Mark> markList) {
@@ -31,6 +34,7 @@ public class MarkServiceImpl implements MarkService {
 		for (Mark mark : markList) {
 			factIdSet.add(mark.getFactId());
 			documentIdSet.add(mark.getDocumentId());
+			fileService.updateFileMarks(mark);
 			mark.setFactId(null);
 			mark.setDocumentId(null);
 			markMapper.updateByPrimaryKeySelective(mark);

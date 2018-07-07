@@ -1,12 +1,13 @@
 server:
   port: 8080
-web:
+my-props:
+  static-path: /Users/JZ/Documents/GitHub/marking_system/src/main/resources/static
   upload-path: /Users/JZ/Downloads/test
 spring:
   mvc:
     static-path-pattern: /**
   resources:
-      static-locations: file:${web.upload-path}, file:/Users/JZ/Documents/GitHub/marking_system/src/main/resources/static
+      static-locations: file:${my-props.static-path}, file:${my-props.upload-path}
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/marking_system

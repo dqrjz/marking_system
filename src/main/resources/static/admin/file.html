@@ -187,6 +187,8 @@
                     }
                 });
                 selectDocuments(null);
+                parent.window.selectUnmarkedDocumentList();
+                parent.window.selectMarkedDocumentList();
             },
             fail: function (e, data) {
                 $.each(data.originalFiles, function (index, file) {

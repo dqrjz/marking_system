@@ -1,5 +1,6 @@
 package ga.dqrjz.marking.controller;
 
+import ga.dqrjz.marking.pojo.ConfigProp;
 import ga.dqrjz.marking.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,8 @@ public class FileController {
 	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
 	@Autowired
 	private FileService fileService;
+	@Autowired
+	private ConfigProp configProp;
 	
 	@PostMapping("upload")
 	@ResponseBody
@@ -28,7 +31,7 @@ public class FileController {
 		ResultFiles resultFiles = new ResultFiles();
 		List<ResultFile> resultFileList = new ArrayList<>();
 		// 文件上传后的路径
-		String filePath = "/Users/JZ/Downloads/test/";
+		String filePath = configProp.getUploadPath()+"/";
 		String fileName, suffixName;
 		File destFile;
 		for (MultipartFile file : files) {

@@ -4,21 +4,20 @@ import ga.dqrjz.marking.mapper.DocumentMapper;
 import ga.dqrjz.marking.mapper.EvidenceMapper;
 import ga.dqrjz.marking.mapper.FactMapper;
 import ga.dqrjz.marking.mapper.MarkMapper;
-import ga.dqrjz.marking.pojo.Document;
-import ga.dqrjz.marking.pojo.Evidence;
-import ga.dqrjz.marking.pojo.Fact;
-import ga.dqrjz.marking.pojo.Mark;
+import ga.dqrjz.marking.pojo.*;
 import ga.dqrjz.marking.service.FileService;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -35,6 +34,8 @@ public class FileServiceImpl implements FileService {
 	private FactMapper factMapper;
 	@Autowired
 	private MarkMapper markMapper;
+	@Autowired
+	private ConfigProp configProp;
 	private Long documentId = 0L, factId = 0L, evidenceId = 0L, markId = 0L;
 	private boolean idInitialized;
 	
@@ -115,10 +116,52 @@ public class FileServiceImpl implements FileService {
 						value = -1;
 					}
 				}
-				markMapper.insert(new Mark(markId++, value, row_factId, col_evidenceId, documentId));
+				markMapper.insert(new Mark(markId++, value, row_factId, col_evidenceId, documentId,
+						rowIndex, colIndex));
 			}
 		}
 		documentId++;
+		try {
+			hssfWorkbook.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	public void updateFileMarks(Mark mark) {
+		Document document = documentMapper.selectByPrimaryKey(mark.getDocumentId());
+		File file = new File(configProp.getUploadPath() + "/" + document.getFilenameXls());
+		//获取表格
+		HSSFWorkbook hssfWorkbook = null;
+		try {
+			hssfWorkbook = new HSSFWorkbook(new FileInputStream(file));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		HSSFSheet sheet = Objects.requireNonNull(hssfWorkbook).getSheetAt(0); //获取第一个sheet
+		HSSFCell cell = sheet.getRow(mark.getRowIndex()).createCell(mark.getColIndex(), CellType.STRING);
+		Integer value = mark.getValue();
+		String stringValue = null;
+		if (value == 0 || value == 1) {
+			stringValue = value.toString();
+		}
+		cell.setCellValue(stringValue);
+		FileOutputStream fileOutputStream = null;
+		try {
+			fileOutputStream = new FileOutputStream(file);
+			hssfWorkbook.write(fileOutputStream);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (fileOutputStream != null) {
+				try {
+					fileOutputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	private void initializeIds() {

@@ -11,16 +11,21 @@ public class Mark {
 	private Long factId;
 	private Long evidenceId;
 	private Long documentId;
+	private Integer rowIndex; // should start from 1
+	private Integer colIndex; // should start from 1
 	
 	public Mark() {
 	}
 	
-	public Mark(Long mid, Integer value, Long factId, Long evidenceId, Long documentId) {
+	public Mark(Long mid, Integer value, Long factId, Long evidenceId, Long documentId, Integer rowIndex, Integer
+			colIndex) {
 		this.mid = mid;
 		this.value = value;
 		this.factId = factId;
 		this.evidenceId = evidenceId;
 		this.documentId = documentId;
+		this.rowIndex = rowIndex;
+		this.colIndex = colIndex;
 	}
 	
 	@Override
@@ -31,6 +36,8 @@ public class Mark {
 				", factId=" + factId +
 				", evidenceId=" + evidenceId +
 				", documentId=" + documentId +
+				", rowIndex=" + rowIndex +
+				", colIndex=" + colIndex +
 				'}';
 	}
 	
@@ -72,5 +79,21 @@ public class Mark {
 	
 	public void setDocumentId(Long documentId) {
 		this.documentId = documentId;
+	}
+	
+	public Integer getRowIndex() {
+		return rowIndex;
+	}
+	
+	public void setRowIndex(Integer rowIndex) {
+		this.rowIndex = rowIndex;
+	}
+	
+	public Integer getColIndex() {
+		return colIndex;
+	}
+	
+	public void setColIndex(Integer colIndex) {
+		this.colIndex = colIndex;
 	}
 }

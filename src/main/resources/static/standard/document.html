@@ -224,6 +224,8 @@
             data['markList[' + i + '].value'] = value;
             data['markList[' + i + '].factId'] = factId;
             data['markList[' + i + '].documentId'] = documentId;
+            data['markList[' + i + '].rowIndex'] = curFactIndex + 1;
+            data['markList[' + i + '].colIndex'] = i + 1;
         }
         $.ajax({
                 type: "PATCH",
