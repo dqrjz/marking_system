@@ -9,17 +9,17 @@ public class Mark {
 	private Long mid;
 	private Integer value; // -1=unmarked, 0=unrelated, 1=related
 	private Long factId;
-	private Long lawId;
+	private Long evidenceId;
 	private Long documentId;
 	
 	public Mark() {
 	}
 	
-	public Mark(Long mid, Integer value, Long factId, Long lawId, Long documentId) {
+	public Mark(Long mid, Integer value, Long factId, Long evidenceId, Long documentId) {
 		this.mid = mid;
 		this.value = value;
 		this.factId = factId;
-		this.lawId = lawId;
+		this.evidenceId = evidenceId;
 		this.documentId = documentId;
 	}
 	
@@ -29,7 +29,7 @@ public class Mark {
 				"mid=" + mid +
 				", value=" + value +
 				", factId=" + factId +
-				", lawId=" + lawId +
+				", evidenceId=" + evidenceId +
 				", documentId=" + documentId +
 				'}';
 	}
@@ -58,12 +58,12 @@ public class Mark {
 		this.factId = factId;
 	}
 	
-	public Long getLawId() {
-		return lawId;
+	public Long getEvidenceId() {
+		return evidenceId;
 	}
 	
-	public void setLawId(Long lawId) {
-		this.lawId = lawId;
+	public void setEvidenceId(Long evidenceId) {
+		this.evidenceId = evidenceId;
 	}
 	
 	public Long getDocumentId() {

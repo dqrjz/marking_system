@@ -24,6 +24,8 @@ public class Document {
 	@Transient
 	private List<Law> lawList;
 	@Transient
+	private List<Evidence> evidenceList;
+	@Transient
 	private User user;
 	
 	public Document() {
@@ -46,7 +48,7 @@ public class Document {
 	
 	public Document(Long did, String filenameXml, String filenameXls, String documentAssignmentStatus, Long userId,
 	                String documentMarkingStatus, String caseName, String caseNumber, String caseReason, String
-			                caseCategory, List<Fact> factList, List<Law> lawList, User user) {
+			                caseCategory, List<Fact> factList, List<Law> lawList, List<Evidence> evidenceList, User user) {
 		this.did = did;
 		this.filenameXml = filenameXml;
 		this.filenameXls = filenameXls;
@@ -59,6 +61,7 @@ public class Document {
 		this.caseCategory = caseCategory;
 		this.factList = factList;
 		this.lawList = lawList;
+		this.evidenceList = evidenceList;
 		this.user = user;
 	}
 	
@@ -77,6 +80,7 @@ public class Document {
 				", caseCategory='" + caseCategory + '\'' +
 				", factList=" + factList +
 				", lawList=" + lawList +
+				", evidenceList=" + evidenceList +
 				", user=" + user +
 				'}';
 	}
@@ -175,6 +179,14 @@ public class Document {
 	
 	public void setLawList(List<Law> lawList) {
 		this.lawList = lawList;
+	}
+	
+	public List<Evidence> getEvidenceList() {
+		return evidenceList;
+	}
+	
+	public void setEvidenceList(List<Evidence> evidenceList) {
+		this.evidenceList = evidenceList;
 	}
 	
 	public User getUser() {

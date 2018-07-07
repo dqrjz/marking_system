@@ -1,9 +1,11 @@
 package ga.dqrjz.marking.service.impl;
 
 import ga.dqrjz.marking.mapper.DocumentMapper;
+import ga.dqrjz.marking.mapper.EvidenceMapper;
 import ga.dqrjz.marking.mapper.FactMapper;
 import ga.dqrjz.marking.mapper.LawMapper;
 import ga.dqrjz.marking.pojo.Document;
+import ga.dqrjz.marking.pojo.Evidence;
 import ga.dqrjz.marking.pojo.Law;
 import ga.dqrjz.marking.pojo.User;
 import ga.dqrjz.marking.service.DocumentService;
@@ -22,6 +24,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private FactMapper factMapper;
 	@Autowired
 	private LawMapper lawMapper;
+	@Autowired
+	private EvidenceMapper evidenceMapper;
 	
 	@Override
 	public Document selectDocument(Document document) {
@@ -34,6 +38,9 @@ public class DocumentServiceImpl implements DocumentService {
 			Law law = new Law();
 			law.setDocumentId(did);
 			document.setLawList(lawMapper.select(law));
+			Evidence evidence = new Evidence();
+			evidence.setDocumentId(did);
+			document.setEvidenceList(evidenceMapper.select(evidence));
 			return document;
 		} else {
 			return null;

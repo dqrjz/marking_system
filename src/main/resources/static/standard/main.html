@@ -137,7 +137,7 @@
         if ($(this).hasClass('ok')) {
             //退出登陆
             $.get(
-                "api/user/logout",
+                "../api/user/logout",
                 function (resultInfo) {
                     if (resultInfo.flag) {
                         //登出成功，跳转到登录页面

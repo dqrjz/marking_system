@@ -186,6 +186,7 @@
                         $('<p/>').text(file.name + " uploaded.").appendTo($("#upload"));
                     }
                 });
+                selectDocuments(null);
             },
             fail: function (e, data) {
                 $.each(data.originalFiles, function (index, file) {

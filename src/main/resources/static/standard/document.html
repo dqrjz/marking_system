@@ -111,13 +111,9 @@
         width: 120,
         name: 'mark'
     }, {
-        label: '法条名称',
-        width: 320,
-        name: 'lawName'
-    }, {
-        label: '法条正文',
+        label: '证据',
         minWidth: 400,
-        name: 'lawContent'
+        name: 'evidenceContent'
     }];
 
     $('.grid').Grid({
@@ -130,7 +126,7 @@
     const did = getParameter("did");
     let savedDocument;
     let curFactIndex = 0;
-    let totalFacts, totalLaws, totalMarks;
+    let totalFacts, totalEvidences, totalMarks;
     selectDocumentByDid();
 
     function selectDocumentByDid() {
@@ -140,9 +136,10 @@
             data: {"did": did},
             dataType: "json",
             success: function (document) {
+                console.log(document);
                 savedDocument = document;
                 totalFacts = document.factList.length;
-                totalLaws = totalMarks = document.lawList.length;
+                totalEvidences = totalMarks = document.evidenceList.length;
                 showCaseInfo();
                 showFactNav();
                 showFact();
@@ -181,15 +178,14 @@
         let oper;
         let mid, value;
         $("div#fact-content").html(savedDocument.factList[curFactIndex].content);
-        for (let i = 0; i < totalLaws; i++) {
+        for (let i = 0; i < totalEvidences; i++) {
             mid = savedDocument.factList[curFactIndex].markList[i].mid;
             oper = "<label for='mark-" + mid + "-0' class='mark'>" +
                 "<input id='mark-" + mid + "-0' type='radio' name='mark-" + mid + "' value='0'/>不相关</label>" +
                 "<br><label for='mark-" + mid + "-1' class='mark'>" +
                 "<input id='mark-" + mid + "-1' type='radio' name='mark-" + mid + "' value='1'/>相关</label>";
             tbody.push([oper,
-                savedDocument.lawList[i].name,
-                savedDocument.lawList[i].content]);
+                savedDocument.evidenceList[i].content]);
         }
         $('.grid').Grid('setData', tbody, head);
         for (let i = 0; i < totalMarks; i++) {
