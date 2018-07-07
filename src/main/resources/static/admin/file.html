@@ -14,35 +14,14 @@
     <div id="hd"></div>
     <div id="bd">
         <div id="main">
-            <!--<a href="/api/file/download">下载test</a>-->
-            <div id="upload">
-                <input id="fileupload" type="file" name="files" data-url="../api/file/upload" multiple>
-            </div>
             <div class="table">
-                <!--<div class="opt ue-clear">-->
-                <!--<span class="sortarea">-->
-                <!--<span class="sort">-->
-                <!--<label>排序：</label>-->
-                <!--<span class="name">-->
-                <!--<i class="icon"></i>-->
-                <!--<span class="text">名称</span>-->
-                <!--</span>-->
-                <!--</span>-->
-
-                <!--<i class="list"></i>-->
-                <!--<i class="card"></i>-->
-                <!--</span>-->
-                <!--<span class="optarea">-->
-                <!--<a href="javascript:;" class="add">-->
-                <!--<i class="icon"></i>-->
-                <!--<span class="text">添加</span>-->
-                <!--</a>-->
-                <!--<a href="javascript:;" class="delete">-->
-                <!--<i class="icon"></i>-->
-                <!--<span class="text">删除</span>-->
-                <!--</a>-->
-                <!--</span>-->
-                <!--</div>-->
+                <div class="opt ue-clear">
+                    <div id="upload">
+                        <label id="upload-label">上传文书（可批量上传）：</label>
+                        <input id="fileupload" type="file" name="files" data-url="../api/file/upload" multiple>
+                    </div>
+                    <a href="../api/file/downloadAll" class="button blue" id="download-all">下载全部</a>
+                </div>
 
                 <div class="grid"></div>
                 <div class="pagination"></div>
@@ -62,15 +41,15 @@
     // 表头
     const head = [{
         label: '编号',
-        width: 50,
+        width: 100,
         name: 'did'
     }, {
         label: '文书名',
-        width: 150,
+        width: 200,
         name: 'filenameXml'
     }, {
         label: '文件下载',
-        width: 250,
+        minWidth: 300,
         name: 'filenameXls'
     }];
 
@@ -98,14 +77,16 @@
         let start = (curPage - 1) * pageSize;
         let end = start + pageSize;
         let document;
-        let filenameXml;
+        let filenameXml, filenameXls;
         for (let i = start; i < end && i < savedDocumentList.length; i++) {
             document = savedDocumentList[i];
             filenameXml = "<a href='javascript:;' class='document-filnameXml'" +
                 " onclick='navSelect(" + document.did + ")'>" + document.filenameXml + "</a>";
+            filenameXls = "<a href='../api/file/download/" + document.filenameXls + "'>" +
+                document.filenameXls + "</a>";
             tbody.push([document.did,
                 filenameXml,
-                document.filenameXls]);
+                filenameXls]);
         }
         $('.grid').Grid('setData', tbody, head);
 
@@ -118,14 +99,6 @@
         $(".ui-table-checkbox input[type='checkbox']").die().live("click", function () {
             updateCheckboxDidList();
         });
-
-        // 批量分配下拉列表填充
-        // let batchAssignUserSelectHtml = "<option value='-1' selected>未分配</option>";
-        // for (const user of standardUserList) {
-        //     batchAssignUserSelectHtml += "<option value='" + user.uid + "'>" + user.username + "</option>";
-        // }
-        // $("label.batch-assign-user select").html(batchAssignUserSelectHtml);
-        // $("div#batch-assign-user-area").hide(); // 默认隐藏
     }
 
     // 点击文件名触发事件(等同于在左侧导航栏点击相应文书)

@@ -288,4 +288,9 @@ select {width: 60px;height: 20px;}
 label.filter-label, label.batch-assign-user {font-weight: bold; font-size: 13px;}
 
 /*upload*/
-div#upload {margin-bottom: 10px;}
+div#upload {margin-top: 9px;float: left;}
+label#upload-label {font-weight: bold;font-size: 13px;float: left;}
+
+/*download-all*/
+a#download-all {float: right;margin-right: 10px;text-align: center;padding-top: 3px;height: 28px;margin-top: 3px;}
+a#download-all:hover{color:white;text-decoration:none;}

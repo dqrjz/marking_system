@@ -2,6 +2,7 @@ package ga.dqrjz.marking.controller;
 
 import ga.dqrjz.marking.pojo.ConfigProp;
 import ga.dqrjz.marking.service.FileService;
+import ga.dqrjz.marking.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.zip.ZipOutputStream;
 
 @RequestMapping("api/file")
 @Controller
@@ -25,13 +28,14 @@ public class FileController {
 	@Autowired
 	private ConfigProp configProp;
 	
+	//文件上传
 	@PostMapping("upload")
 	@ResponseBody
 	public ResultFiles upload(@RequestParam("files") MultipartFile[] files) {
 		ResultFiles resultFiles = new ResultFiles();
 		List<ResultFile> resultFileList = new ArrayList<>();
 		// 文件上传后的路径
-		String filePath = configProp.getUploadPath()+"/";
+		String filePath = configProp.getUploadPath() + "/";
 		String fileName, suffixName;
 		File destFile;
 		for (MultipartFile file : files) {
@@ -70,19 +74,17 @@ public class FileController {
 		return resultFiles;
 	}
 	
-	//文件下载相关代码
-	@GetMapping("/download")
+	//单个文件下载
+	@GetMapping("/download/{filename}")
 	@ResponseBody
-	public String downloadFile(HttpServletRequest request, HttpServletResponse response) {
-		String fileName = "444.xml_20180705.xls";
-		if (fileName != null) {
+	public String download(@PathVariable("filename") String filename, HttpServletResponse response) {
+		if (filename != null) {
 			//realPath为服务器文件所在地址，会下载到本机的默认下载的目录
-			String realPath = "/Users/JZ/Downloads/test";
-			File file = new File(realPath, fileName);
+			File file = new File(configProp.getUploadPath(), filename);
 			if (file.exists()) {
 				response.setContentType("application/force-download");// 设置强制下载不打开
 				response.addHeader("Content-Disposition",
-						"attachment;fileName=" + fileName);// 设置文件名
+						"attachment;fileName=" + filename);// 设置文件名
 				byte[] buffer = new byte[1024];
 				FileInputStream fis = null;
 				BufferedInputStream bis = null;
@@ -113,6 +115,57 @@ public class FileController {
 							e.printStackTrace();
 						}
 					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	//所有文件压缩打包下载
+	@GetMapping("/downloadAll")
+	@ResponseBody
+	public String downloadAll(HttpServletResponse response) {
+		FileInputStream fis = null;
+		BufferedInputStream bis = null;
+		try {
+			String zipName = UUID.randomUUID() + ".zip";
+			File zipFile = new File(zipName);
+			List<File> fileList = IOUtil.getFiles(configProp.getUploadPath());
+			FileOutputStream outStream = new FileOutputStream(zipFile);
+			ZipOutputStream toClient = new ZipOutputStream(outStream);
+			IOUtil.zipFiles(fileList, toClient);
+			toClient.close();
+			outStream.close();
+//			IOUtil.downloadFile(fileZip, response, true);
+			
+			response.setContentType("application/force-download");// 设置强制下载不打开
+			response.addHeader("Content-Disposition",
+					"attachment;fileName=" + zipName);// 设置文件名
+			byte[] buffer = new byte[1024];
+			fis = new FileInputStream(zipFile);
+			bis = new BufferedInputStream(fis);
+			OutputStream os = response.getOutputStream();
+			int i = bis.read(buffer);
+			while (i != -1) {
+				os.write(buffer, 0, i);
+				i = bis.read(buffer);
+			}
+			System.out.println("success");
+		} catch (ServletException | IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (bis != null) {
+				try {
+					bis.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
