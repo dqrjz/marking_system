@@ -20,28 +20,28 @@
             </div>
             <div class="table">
                 <!--<div class="opt ue-clear">-->
-                    <!--<span class="sortarea">-->
-                    <!--<span class="sort">-->
-                    <!--<label>排序：</label>-->
-                    <!--<span class="name">-->
-                    <!--<i class="icon"></i>-->
-                    <!--<span class="text">名称</span>-->
-                    <!--</span>-->
-                    <!--</span>-->
+                <!--<span class="sortarea">-->
+                <!--<span class="sort">-->
+                <!--<label>排序：</label>-->
+                <!--<span class="name">-->
+                <!--<i class="icon"></i>-->
+                <!--<span class="text">名称</span>-->
+                <!--</span>-->
+                <!--</span>-->
 
-                    <!--<i class="list"></i>-->
-                    <!--<i class="card"></i>-->
-                    <!--</span>-->
-                    <!--<span class="optarea">-->
-                        <!--<a href="javascript:;" class="add">-->
-                            <!--<i class="icon"></i>-->
-                            <!--<span class="text">添加</span>-->
-                        <!--</a>-->
-                        <!--<a href="javascript:;" class="delete">-->
-                            <!--<i class="icon"></i>-->
-                            <!--<span class="text">删除</span>-->
-                        <!--</a>-->
-                    <!--</span>-->
+                <!--<i class="list"></i>-->
+                <!--<i class="card"></i>-->
+                <!--</span>-->
+                <!--<span class="optarea">-->
+                <!--<a href="javascript:;" class="add">-->
+                <!--<i class="icon"></i>-->
+                <!--<span class="text">添加</span>-->
+                <!--</a>-->
+                <!--<a href="javascript:;" class="delete">-->
+                <!--<i class="icon"></i>-->
+                <!--<span class="text">删除</span>-->
+                <!--</a>-->
+                <!--</span>-->
                 <!--</div>-->
 
                 <div class="grid"></div>
@@ -170,6 +170,9 @@
     $(function () {
         $('#fileupload').fileupload({
             dataType: 'json',
+            singleFileUploads: false,
+            limitMultiFileUploadSize: 10000000,
+            sequentialUploads: true,
             add: function (e, data) {
                 // data.context = $('<p/>').text('Uploading...').appendTo($("#upload"));
                 data.submit();
@@ -177,20 +180,19 @@
             done: function (e, data) {
                 // data.context.text('Upload finished.');
                 $.each(data.result.files, function (index, file) {
-                    $('<p/>').text(file.name + " uploaded.").appendTo($("#upload"));
+                    if (file.error) {
+                        $('<p/>').text(file.name + " upload failed: " + file.error).appendTo($("#upload"));
+                    } else {
+                        $('<p/>').text(file.name + " uploaded.").appendTo($("#upload"));
+                    }
+                });
+            },
+            fail: function (e, data) {
+                $.each(data.originalFiles, function (index, file) {
+                    $('<p/>').text(file.name + " upload failed: " + data.messages.uploadedBytes).appendTo($("#upload"));
                 });
             }
         });
     });
-    // $(function () {
-    //     $('#fileupload').fileupload({
-    //         dataType: 'json',
-    //         done: function (e, data) {
-    //             $.each(data.result.files, function (index, file) {
-    //                 $('<p/>').text(file.name).appendTo(document.body);
-    //             });
-    //         }
-    //     });
-    // });
 </script>
 </html>

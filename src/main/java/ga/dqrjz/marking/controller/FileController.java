@@ -1,7 +1,9 @@
 package ga.dqrjz.marking.controller;
 
+import ga.dqrjz.marking.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,11 +13,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RequestMapping("api/file")
 @Controller
 public class FileController {
 	private static final Logger logger = LoggerFactory.getLogger(FileController.class);
+	@Autowired
+	private FileService fileService;
 	
 	@PostMapping("upload")
 	@ResponseBody
@@ -24,7 +29,8 @@ public class FileController {
 		List<ResultFile> resultFileList = new ArrayList<>();
 		// 文件上传后的路径
 		String filePath = "/Users/JZ/Downloads/test/";
-		String fileName;
+		String fileName, suffixName;
+		File destFile;
 		for (MultipartFile file : files) {
 			if (file.isEmpty()) {
 				logger.info("文件为空");
@@ -32,23 +38,32 @@ public class FileController {
 			// 获取文件名
 			fileName = file.getOriginalFilename();
 			logger.info("上传的文件名为：" + fileName);
-			// 解决中文问题，liunx下中文路径，图片显示问题
-			// fileName = UUID.randomUUID() + suffixName;
-			File dest = new File(filePath + fileName);
-			// 检测是否存在目录
-			if (!dest.getParentFile().exists()) {
-				dest.getParentFile().mkdirs();
-			}
-			try {
-				file.transferTo(dest);
-				resultFileList.add(new ResultFile(fileName, file.getSize(), null));
-				logger.info("上传成功");
-			} catch (IllegalStateException | IOException e) {
-				e.printStackTrace();
-				logger.info("上传失败");
+			// 后缀名必须为.xls
+			suffixName = fileName.substring(fileName.lastIndexOf("."));
+			if (Objects.equals(suffixName, ".xls")) {
+				// 解决中文问题，liunx下中文路径，图片显示问题
+				// fileName = UUID.randomUUID() + suffixName;
+				destFile = new File(filePath + fileName);
+				// 检测是否存在目录
+				if (!destFile.getParentFile().exists()) {
+					destFile.getParentFile().mkdirs();
+				}
+				try {
+					file.transferTo(destFile);
+					fileService.importFile(destFile);
+					resultFileList.add(new ResultFile(fileName, file.getSize()));
+					logger.info("上传成功");
+				} catch (IllegalStateException | IOException e) {
+					e.printStackTrace();
+					resultFileList.add(new ResultFileError(fileName, file.getSize(), "Error!"));
+					logger.info("上传失败");
+				}
+			} else {
+				resultFileList.add(new ResultFileError(fileName, file.getSize(), "File type not allowed!"));
 			}
 		}
 		resultFiles.setFiles(resultFileList);
+//		System.out.println(resultFiles);
 		return resultFiles;
 	}
 	
@@ -104,51 +119,86 @@ public class FileController {
 	class ResultFile {
 		private String name;
 		private Long size;
-		private String url;
 		
 		ResultFile() {
 		}
 		
-		ResultFile(String name, Long size, String url) {
+		ResultFile(String name, Long size) {
 			this.name = name;
 			this.size = size;
-			this.url = url;
 		}
 		
-		String getName() {
+		public String getName() {
 			return name;
 		}
 		
-		void setName(String name) {
+		public void setName(String name) {
 			this.name = name;
 		}
 		
-		Long getSize() {
+		public Long getSize() {
 			return size;
 		}
 		
-		void setSize(Long size) {
+		public void setSize(Long size) {
 			this.size = size;
 		}
 		
-		String getUrl() {
-			return url;
+		@Override
+		public String toString() {
+			return "ResultFile{" +
+					"name='" + name + '\'' +
+					", size=" + size +
+					'}';
+		}
+	}
+	
+	class ResultFileError extends ResultFile {
+		private String error;
+		
+		public ResultFileError(String error) {
+			this.error = error;
 		}
 		
-		void setUrl(String url) {
-			this.url = url;
+		ResultFileError(String name, Long size, String error) {
+			super(name, size);
+			this.error = error;
+		}
+		
+		public String getError() {
+			return error;
+		}
+		
+		public void setError(String error) {
+			this.error = error;
+		}
+		
+		@Override
+		public String toString() {
+			return "ResultFileError{" +
+					"name='" + super.name + '\'' +
+					", size=" + super.size +
+					", error='" + error + '\'' +
+					'}';
 		}
 	}
 	
 	class ResultFiles {
 		private List<ResultFile> files;
 		
-		List<ResultFile> getFiles() {
+		public List<ResultFile> getFiles() {
 			return files;
 		}
 		
-		void setFiles(List<ResultFile> files) {
+		public void setFiles(List<ResultFile> files) {
 			this.files = files;
+		}
+		
+		@Override
+		public String toString() {
+			return "ResultFiles{" +
+					"files=" + files +
+					'}';
 		}
 	}
 }

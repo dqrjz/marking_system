@@ -226,7 +226,7 @@
             function (userList) {
                 standardUserList = userList;
                 let selectHtml = "<option value='0' selected>所有用户</option>";
-                for (const user of userList) {
+                for (const user of standardUserList) {
                     selectHtml += "<option value='" + user.uid + "'>" + user.username + "</option>";
                 }
                 $("label.filter-assigned-user select").html(selectHtml);

@@ -19,10 +19,4 @@ public class LawServiceImpl implements LawService {
 		return lawMapper.select(law);
 	}
 
-//	@Override
-//	public List<Law> selectLawsByDocumentId(int documentId) {
-//		return lawMapper.selectLawsByDocumentId(documentId);
-//	}
-
-
 }
