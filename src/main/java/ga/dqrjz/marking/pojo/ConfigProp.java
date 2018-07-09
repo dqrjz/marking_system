@@ -1,5 +1,7 @@
 package ga.dqrjz.marking.pojo;
 
+import ga.dqrjz.marking.service.FileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Component;
 public class ConfigProp {
 	private String staticPath;
 	private String uploadPath;
+	@Autowired
+	private FileService fileService;
 	
 	public String getStaticPath() {
 		return staticPath;
@@ -23,5 +27,7 @@ public class ConfigProp {
 	
 	public void setUploadPath(String uploadPath) {
 		this.uploadPath = uploadPath;
+		//启动时加载upload文件夹的已有文书
+		fileService.importAll(uploadPath);
 	}
 }

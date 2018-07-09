@@ -50,6 +50,16 @@ public class FileServiceImpl implements FileService {
 		
 		//importDocuments
 		String filenameXls = file.getName();
+		if (filenameXls.startsWith(".") || !filenameXls.endsWith(".xls")) {
+			System.out.println("- Wrong file type: " + filenameXls);
+			return;
+		}
+		Document selectDocument = new Document();
+		selectDocument.setFilenameXls(filenameXls);
+		if (documentMapper.select(selectDocument).size() != 0) {
+			System.out.println("- Document already exists: " + filenameXls);
+			return;
+		}
 //		Long documentId = Long.parseLong(filenameXls.substring(0, filenameXls.indexOf("_")));
 		String filenameXml = filenameXls.substring(0, filenameXls.lastIndexOf("_"));
 		documentAssignmentStatus = documentMarkingStatus = "N";
@@ -125,6 +135,18 @@ public class FileServiceImpl implements FileService {
 			hssfWorkbook.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		System.out.println("- Document imported: " + filenameXls);
+	}
+	
+	@Override
+	public void importAll(String uploadPath) {
+		System.out.println("Importing all files from uploadPath: " + uploadPath);
+		File[] files = new File(uploadPath).listFiles();
+		if (files != null) {
+			for (File file : files) {
+				this.importFile(file);
+			}
 		}
 	}
 	
