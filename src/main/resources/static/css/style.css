@@ -166,7 +166,7 @@ textarea{height:80px; background:none;}
 .fact-nav a, .fact-nav span {display: block;float: left;height:32px;line-height:32px;padding:0 10px;font-family:Arial, Helvetica, sans-serif !important;}
 .fact-nav .current {cursor:default;}
 
-.fact-nav a,.fact-nav span{text-align:center; width:50px;color: #3399cc;border:1px solid #dddddd;border-left:1px solid #ddd;border-collapse: collapse;margin-top: 3px}
+.fact-nav a,.fact-nav span{text-align:center; width:55px;color: #3399cc;border:1px solid #dddddd;border-left:1px solid #ddd;border-collapse: collapse;margin-top: 3px}
 .fact-nav a,.fact-nav span{border-bottom: 3px solid;border-bottom-left-radius: 5px;border-bottom-right-radius: 5px;}
 .fact-nav .current{color:#fff;background: #26a3de;border-top:1px solid #2396cc;border-left:1px solid #2396cc;border-right:1px solid #2396cc;}
 .fact-nav a.marked,.fact-nav span.marked {border-bottom-color: #06d700;}
