@@ -48,6 +48,9 @@
         width: 200,
         name: 'filenameXml'
     }, {
+        label: '是否完成标注',
+        width: 100
+    }, {
         label: '文件下载',
         minWidth: 300,
         name: 'filenameXls'
@@ -78,15 +81,18 @@
         let start = (curPage - 1) * pageSize;
         let end = start + pageSize;
         let document;
-        let filenameXml, filenameXls;
+        let filenameXml, documentMarkingStatus, filenameXls;
         for (let i = start; i < end && i < savedDocumentList.length; i++) {
             document = savedDocumentList[i];
             filenameXml = "<a href='javascript:;' class='document-filnameXml'" +
                 " onclick='navSelect(" + document.did + ")'>" + document.filenameXml + "</a>";
+            documentMarkingStatus = document.documentMarkingStatus === "N" ?
+                "<span style='color: red'>未标注</span>" : "<span style='color: green'>已标注</span>";
             filenameXls = "<a href='../api/file/download/" + document.filenameXls + "'>" +
                 document.filenameXls + "</a>";
             tbody.push([document.did,
                 filenameXml,
+                documentMarkingStatus,
                 filenameXls]);
         }
         $('.grid').Grid('setData', tbody, head);
