@@ -90,7 +90,7 @@
 <script type="text/javascript" src="../js/global.js"></script>
 <script type="text/javascript" src="../js/jquery.select.js"></script>
 <script type="text/javascript" src="../js/core.js"></script>
-<script type="text/javascript" src="../js/jquery.pagination.20.js"></script>
+<script type="text/javascript" src="../js/jquery.pagination.js"></script>
 <script type="text/javascript" src="../js/jquery.grid.js"></script>
 <script type="text/javascript" src="../js/WdatePicker.js"></script>
 <script type="text/javascript">
@@ -211,7 +211,8 @@
                 curPage = page + 1;
                 showTable();
             },
-            display_msg: true
+            display_msg: true,
+            items_per_page: pageSize
         });
     }
 </script>
