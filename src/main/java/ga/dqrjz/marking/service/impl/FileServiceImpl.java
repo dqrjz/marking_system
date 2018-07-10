@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -142,12 +144,30 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public void importAll(String uploadPath) {
 		System.out.println("Importing all files from uploadPath: " + uploadPath);
-		File[] files = new File(uploadPath).listFiles();
-		if (files != null) {
-			for (File file : files) {
-				this.importFile(file);
+		List<File> files = Arrays.asList(Objects.requireNonNull(new File(uploadPath).listFiles((dir, name) ->
+				!name.startsWith(".") && name.endsWith(".xls"))));
+		files.sort((o1, o2) -> {
+			if (o1.isDirectory() && o2.isFile())
+				return -1;
+			if (o1.isFile() && o2.isDirectory())
+				return 1;
+			Integer filenameInt1 = getFilenameInt(o1.getName());
+			Integer filenameInt2 = getFilenameInt(o2.getName());
+			return Integer.compare(filenameInt1, filenameInt2);
+		});
+		for (File file : files) {
+			this.importFile(file);
+		}
+	}
+	
+	private Integer getFilenameInt(String filename) {
+		StringBuilder sb = new StringBuilder();
+		for (char c : filename.substring(0, filename.indexOf(".")).toCharArray()) {
+			if (Character.isDigit(c)) {
+				sb.append(c);
 			}
 		}
+		return Integer.parseInt(sb.toString());
 	}
 	
 	@Override
