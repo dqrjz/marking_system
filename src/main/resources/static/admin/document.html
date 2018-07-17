@@ -159,7 +159,7 @@
 
     // helper functions
     function showCaseInfo() {
-        $("span#basic-info-title").html("基本信息："+ savedDocument.filenameXml)
+        $("span#basic-info-title").html("基本信息：<i>"+ savedDocument.filenameXml+"</i>")
         $("td#case-name").html("案件名称：" + savedDocument.caseName);
         $("td#case-number").html("案号：" + savedDocument.caseNumber);
         $("td#case-reason").html("案由：" + savedDocument.caseReason);
