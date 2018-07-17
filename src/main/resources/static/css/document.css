@@ -112,7 +112,7 @@
 .subfield span {
     display: block;
     margin-left: 1px;
-    width: 70px;
+    width: fit-content;
     text-align: center;
     height: 24px;
     line-height: 24px;
