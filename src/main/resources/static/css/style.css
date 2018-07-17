@@ -304,3 +304,5 @@ label#upload-label {font-weight: bold;font-size: 13px;float: left;}
 /*download-all*/
 a#download-all {float: right;margin-right: 10px;text-align: center;padding-top: 3px;height: 28px;margin-top: 3px;}
 a#download-all:hover{color:white;text-decoration:none;}
+
+i {font-style:  italic;}
