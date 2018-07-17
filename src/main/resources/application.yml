@@ -4,7 +4,7 @@ server:
     context-path: /marking_system
 my-props:
   static-path: /Users/JZ/Documents/GitHub/marking_system/src/main/resources/static
-  upload-path: /Users/JZ/Downloads/test
+  upload-path: /Users/JZ/Downloads/upload
 spring:
   mvc:
     static-path-pattern: /**
@@ -20,6 +20,7 @@ mybatis:
   mapper-locations: classpath:mappers/*.xml
   configuration:
     map-underscore-to-camel-case: true
+#debug: true
 #logging:
 #  level:
 #   ga.dqrjz.marking: debug
