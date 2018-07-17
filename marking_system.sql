@@ -102,4 +102,25 @@ drop table user;
 select *
 from fact f
   inner join mark m on f.fid = m.fact_id
-where f.document_id = 0
+where f.document_id = 0;
+
+select username, count(did) from user, document where uid = user_id group by uid;
+-- 10*29 + 7*30
+update document set document_marking_status = 'Y' where did between 0 and 2;
+update document set user_id =  1 where did between   0 and  29;
+update document set user_id =  2 where did between  30 and  59;
+update document set user_id =  3 where did between  60 and  89;
+update document set user_id =  4 where did between  90 and 119;
+update document set user_id =  5 where did between 120 and 149;
+update document set user_id =  6 where did between 150 and 179;
+update document set user_id =  7 where did between 180 and 209;
+update document set user_id =  8 where did between 210 and 239;
+update document set user_id =  9 where did between 240 and 269;
+update document set user_id = 10 where did between 270 and 289;
+update document set user_id = 11 where did between 300 and 329;
+update document set user_id = 12 where did between 330 and 359;
+update document set user_id = 13 where did between 360 and 389;
+update document set user_id = 14 where did between 390 and 419;
+update document set user_id = 15 where did between 420 and 449;
+update document set user_id = 16 where did between 450 and 474;
+update document set user_id = 17 where did between 475 and 499;
