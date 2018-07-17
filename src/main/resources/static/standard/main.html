@@ -139,10 +139,10 @@
             $.get(
                 "../api/user/logout",
                 function (resultInfo) {
-                    if (resultInfo.flag) {
+                    // if (resultInfo.flag) {
                         //登出成功，跳转到登录页面
                         window.location.href = "login";
-                    }
+                    // }
                 },
                 "json"
             );
