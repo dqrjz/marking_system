@@ -14,6 +14,23 @@
     <div id="hd"></div>
     <div id="bd">
         <div id="main">
+            <div class="kv-item ue-clear">
+                <label class="filter-label">筛选文书：</label>
+                <div class="kv-item-content ue-clear">
+                    <label for="filter-document-all" class="filter-document">
+                        <input id="filter-document-all" type="radio" name="filter" checked/>
+                        全部
+                    </label>
+                    <label for="filter-document-marked" class="filter-document">
+                        <input id="filter-document-marked" type="radio" name="filter"/>
+                        已标注
+                    </label>
+                    <label for="filter-document-unmarked" class="filter-document">
+                        <input id="filter-document-unmarked" type="radio" name="filter"/>
+                        未标注
+                    </label>
+                </div>
+            </div>
             <div class="table">
                 <div class="opt ue-clear">
                     <div id="upload">
@@ -68,6 +85,21 @@
     let curPage = 1;
     const pageSize = 50;
     let savedDocumentList;
+
+    // 筛选文书radio按钮点击事件
+    $("label.filter-document").click(function () {
+        filterDocument = $(this).children("input").attr("id");
+        if (filterDocument === "filter-document-marked") {
+            // 获取所有已标注文书
+            selectDocuments({documentMarkingStatus: "Y"});
+        } else if (filterDocument === "filter-document-unmarked") {
+            // 获取所有未标注文书
+            selectDocuments({documentMarkingStatus: "N"});
+        } else {
+            // 获取所有文书
+            selectDocuments(null);
+        }
+    });
 
     // 填充数据 helper function
     function showTable() {
