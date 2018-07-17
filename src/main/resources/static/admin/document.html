@@ -83,9 +83,17 @@
                 <div class="grid"></div>
                 <!--<div class="fact-nav"></div>-->
                 <div class="search-button">
-                    <input class="button blue" id="submit-marks" disabled="disabled"
-                           type="button" value="提交" onclick="submitMarks()"/>
-                    <span id="submit-msg"></span>
+                    <div id="submit">
+                        <input class="button blue" id="submit-marks" disabled="disabled"
+                               type="button" value="提交" onclick="submitMarks()"/>
+                        <span id="submit-msg"></span>
+                    </div>
+                    <div id="mark-all">
+                        <input class="button gray" id="all-unrelated"
+                               type="button" value="全部不相关" onclick="markAll(0)"/>
+                        <input class="button white" id="all-related"
+                               type="button" value="全部相关" onclick="markAll(1)"/>
+                    </div>
                     <input class="button white" id="reset-marks"
                            type="button" value="还原修改" onclick="resetMarks()"/>
                     <input class="button gray" id="clear-marks"
@@ -149,10 +157,10 @@
 
     // helper functions
     function showCaseInfo() {
-        $("td#case-name").html("案件名称：" + savedDocument.caseName)
-        $("td#case-number").html("案号：" + savedDocument.caseNumber)
-        $("td#case-reason").html("案由：" + savedDocument.caseReason)
-        $("td#case-category").html("案件类别：" + savedDocument.caseCategory)
+        $("td#case-name").html("案件名称：" + savedDocument.caseName);
+        $("td#case-number").html("案号：" + savedDocument.caseNumber);
+        $("td#case-reason").html("案由：" + savedDocument.caseReason);
+        $("td#case-category").html("案件类别：" + savedDocument.caseCategory);
     }
 
     function showFactNav() {
@@ -234,7 +242,7 @@
                 dataType: "json",
                 success: function () {
                     selectDocumentByDid();
-                    $("span#submit-msg").addClass("success-msg").text("提交成功");
+                    // $("span#submit-msg").addClass("success-msg").text("提交成功");
                     console.log("提交成功");
                 },
                 error: function () {
@@ -243,7 +251,26 @@
                 }
             }
         );
-        $("input#submit-marks").attr("disabled", true);
+        $("input#submit-marks").val("提交成功").attr("disabled", true);
+    }
+
+    //标注全部
+    function markAll(value) {
+        let mid;
+        if (value === 0) {
+            for (let i = 0; i < totalMarks; i++) {
+                mid = savedDocument.factList[curFactIndex].markList[i].mid;
+                $("input#mark-" + mid + "-0").attr("checked", true);
+                $("input#mark-" + mid + "-1").attr("checked", false);
+            }
+        } else if (value === 1) {
+            for (let i = 0; i < totalMarks; i++) {
+                mid = savedDocument.factList[curFactIndex].markList[i].mid;
+                $("input#mark-" + mid + "-0").attr("checked", false);
+                $("input#mark-" + mid + "-1").attr("checked", true);
+            }
+        }
+        checkIfMarksChanged();
     }
 
     // 清空该事实的标注
@@ -272,7 +299,7 @@
                 $("input#mark-" + mid + "-1").attr("checked", false);
             }
         }
-        $("input#submit-marks").attr("disabled", true);
+        $("input#submit-marks").val("提交").attr("disabled", true);
     }
 
     // 判断标注是否有修改，改变"提交"按钮样式
@@ -290,10 +317,10 @@
             }
         }
         if (changed) {
-            $("input#submit-marks").attr("disabled", false);
-            $("span#submit-msg").remove("success-msg").text("");
+            $("input#submit-marks").val("提交").attr("disabled", false);
+            // $("span#submit-msg").remove("success-msg").text("");
         } else {
-            $("input#submit-marks").attr("disabled", true);
+            $("input#submit-marks").val("提交").attr("disabled", true);
         }
     }
 

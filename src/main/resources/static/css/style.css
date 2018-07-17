@@ -268,11 +268,17 @@ textarea{height:80px; background:none;}
 }
 /*提交按钮*/
 div.search-button {height: 80px}
-input#clear-marks {float: right; margin-right: 10px}
-input#reset-marks {float: right;}
+div#submit {float: left}
 span#submit-msg {margin-left: 5px;font-size: 13px}
 span.success-msg {color:green}
 span.error-msg {color:red}
+/*全部不相关 与 全部相关*/
+div#mark-all {float:left; position:relative; left:25%; width: 270px}
+input#all-unrelated {}
+input#all-related {margin-left: 10px}
+/*清空标注 与 还原修改*/
+input#clear-marks {float: right; margin-right: 10px}
+input#reset-marks {float: right;}
 
 
 /* 任务分配提交按钮 */
