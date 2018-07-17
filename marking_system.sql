@@ -67,6 +67,11 @@ insert into user values(12,"user12","123","standard");
 insert into user values(13,"user13","123","standard");
 insert into user values(14,"user14","123","standard");
 insert into user values(15,"user15","123","standard");
+insert into user values(16,"user16","123","standard");
+insert into user values(17,"user17","123","standard");
+insert into user values(18,"user18","123","standard");
+insert into user values(19,"user19","123","standard");
+insert into user values(20,"user20","123","standard");
 
 select * from document;
 select * from fact;
