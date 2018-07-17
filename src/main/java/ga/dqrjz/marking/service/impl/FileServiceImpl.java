@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -44,6 +45,10 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public void importFile(File file) {
 		initializeIds();
+		Document documentToInsert;
+		Fact fact;
+		List<Fact> factToInsertList = new ArrayList<>();
+		List<String> factMarkingStatusList = new ArrayList<>();
 		String documentAssignmentStatus; // N=unassigned, Y=assigned
 		String documentMarkingStatus, factMarkingStatus; // N=unmarked, Y=marked
 		Long userId; // -1=unassigned
@@ -64,11 +69,12 @@ public class FileServiceImpl implements FileService {
 		}
 //		Long documentId = Long.parseLong(filenameXls.substring(0, filenameXls.indexOf("_")));
 		String filenameXml = filenameXls.substring(0, filenameXls.lastIndexOf("_"));
-		documentAssignmentStatus = documentMarkingStatus = "N";
+		documentAssignmentStatus = "N";
+		documentMarkingStatus = "Y";
 		userId = -1L;
 //		case_name = case_number = case_reason = case_category = "...";
-		documentMapper.insert(new Document(documentId, filenameXml, filenameXls, documentAssignmentStatus,
-				userId, documentMarkingStatus, case_name, case_number, case_reason, case_category));
+		documentToInsert = new Document(documentId, filenameXml, filenameXls, documentAssignmentStatus,
+				userId, documentMarkingStatus, case_name, case_number, case_reason, case_category);
 		
 		//获取表格
 		HSSFWorkbook hssfWorkbook = null;
@@ -100,8 +106,8 @@ public class FileServiceImpl implements FileService {
 		HSSFRow factContentRow;
 		while ((factContentRow = sheet.getRow(row)) != null) {
 			String factContent = factContentRow.getCell(0).getRichStringCellValue().getString().trim();
-			factMarkingStatus = "N";
-			factMapper.insert(new Fact(factId++, factContent, documentId, factMarkingStatus));
+			factMarkingStatus = "Y";
+			factToInsertList.add(new Fact(factId++, factContent, documentId, factMarkingStatus));
 			row++;
 		}
 		
@@ -113,11 +119,13 @@ public class FileServiceImpl implements FileService {
 			for (Long col_evidenceId = evidenceId0; col_evidenceId < evidenceId; col_evidenceId++) { // col evidence
 //					System.out.println("markId=" + markId + ", factId=" + row + ", lawId=" + col
 //							+ ", documentId=" + documentId);
+				factMarkingStatus = "Y";
 				int rowIndex = (int) (row_factId - factId0 + 1);
 				int colIndex = (int) (col_evidenceId - evidenceId0 + 1);
 				markValueCell = sheet.getRow(rowIndex).getCell(colIndex);
 				if (markValueCell == null || StringUtils.isEmpty(markValueCell.getRichStringCellValue().getString())) {
 					value = -1;
+					factMarkingStatus = "N";
 				} else {
 					markValue = (int) Double.parseDouble(markValueCell.getRichStringCellValue().getString());
 					if (markValue == 0) {
@@ -126,10 +134,14 @@ public class FileServiceImpl implements FileService {
 						value = 1;
 					} else {
 						value = -1;
+						factMarkingStatus = "N";
 					}
 				}
 				markMapper.insert(new Mark(markId++, value, row_factId, col_evidenceId, documentId,
 						rowIndex, colIndex));
+				fact = factToInsertList.get(rowIndex - 1);
+				fact.setFactMarkingStatus(factMarkingStatus);
+				factMarkingStatusList.add(factMarkingStatus);
 			}
 		}
 		documentId++;
@@ -137,6 +149,14 @@ public class FileServiceImpl implements FileService {
 			hssfWorkbook.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		
+		if (factMarkingStatusList.contains("N")) {
+			documentToInsert.setDocumentMarkingStatus("N");
+		}
+		documentMapper.insert(documentToInsert);
+		for (Fact factToInsert : factToInsertList) {
+			factMapper.insert(factToInsert);
 		}
 		System.out.println("- Document imported: " + filenameXls);
 	}
@@ -162,7 +182,7 @@ public class FileServiceImpl implements FileService {
 	
 	private Integer getFilenameInt(String filename) {
 		StringBuilder sb = new StringBuilder();
-		for (char c : filename.substring(0, filename.indexOf(".")).toCharArray()) {
+		for (char c : filename.substring(0, filename.indexOf("_")).toCharArray()) {
 			if (Character.isDigit(c)) {
 				sb.append(c);
 			}
