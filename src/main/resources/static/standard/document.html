@@ -15,10 +15,12 @@
     </div>
     <div id="bd">
         <div id="main">
+            <input class="button white" id="display-basic-info"
+                   type="button" value="显示案件基本信息" onclick="displayBasicInfo()"/>
             <h2 class="subfield">
-                <span>基本信息</span>
+                <span id="basic-info-title">基本信息</span>
             </h2>
-            <div class="subfield-content">
+            <div class="subfield-content" id="basic-info" hidden>
                 <table id="basic_info_table">
                     <tbody>
                     <tr>
@@ -157,10 +159,22 @@
 
     // helper functions
     function showCaseInfo() {
+        $("span#basic-info-title").html("基本信息：<i>" + savedDocument.filenameXml + "</i>");
         $("td#case-name").html("案件名称：" + savedDocument.caseName);
         $("td#case-number").html("案号：" + savedDocument.caseNumber);
         $("td#case-reason").html("案由：" + savedDocument.caseReason);
         $("td#case-category").html("案件类别：" + savedDocument.caseCategory);
+    }
+
+    function displayBasicInfo() {
+        let basicInfo = $("div#basic-info");
+        if (basicInfo.is(':hidden')) {
+            basicInfo.show();
+            $("input#display-basic-info").val("隐藏案件基本信息");
+        } else {
+            basicInfo.hide();
+            $("input#display-basic-info").val("显示案件基本信息");
+        }
     }
 
     function showFactNav() {
